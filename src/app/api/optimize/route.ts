@@ -1,0 +1,46 @@
+import { NextRequest, NextResponse } from "next/server";
+import { optimizePage } from "@/lib/optimizer";
+import type { ScrapedPage } from "@/lib/types";
+
+export async function POST(req: NextRequest) {
+  let body: Partial<ScrapedPage>;
+  try {
+    body = await req.json();
+  } catch {
+    return NextResponse.json(
+      { success: false, error: "Invalid request body." },
+      { status: 400 }
+    );
+  }
+
+  const { url, htmlContent, title, metaDescription, h1, screenshotBase64 } = body;
+
+  if (!url || !htmlContent) {
+    return NextResponse.json(
+      { success: false, error: "Missing required fields: url, htmlContent." },
+      { status: 400 }
+    );
+  }
+
+  const scraped: ScrapedPage = {
+    url: url!,
+    htmlContent: htmlContent!,
+    title: title ?? "",
+    metaDescription: metaDescription ?? "",
+    h1: h1 ?? "",
+    screenshotBase64: screenshotBase64 ?? "",
+  };
+
+  try {
+    const data = await optimizePage(scraped);
+    return NextResponse.json({ success: true, data });
+  } catch (err) {
+    console.error("[optimize]", err);
+    return NextResponse.json(
+      { success: false, error: "AI optimization failed. Please try again." },
+      { status: 500 }
+    );
+  }
+}
+
+export const maxDuration = 60;
