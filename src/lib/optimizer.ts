@@ -80,18 +80,24 @@ function validateResult(result: OptimizationResult): boolean {
 
 async function callClaude(scraped: ScrapedPage): Promise<OptimizationResult> {
   const response = await client.messages.create({
-    model: "claude-opus-4-6",
-    max_tokens: 8000,
+    model: "claude-sonnet-4-6",
+    max_tokens: 16000,
     system: SYSTEM_PROMPT,
     messages: [{ role: "user", content: buildPrompt(scraped) }],
   });
 
   const raw = (response.content[0] as { text: string }).text;
-  // Strip any accidental ```json fences
-  const cleaned = raw
-    .replace(/^```json\s*/i, "")
-    .replace(/\s*```$/, "")
-    .trim();
+
+  // Extract the JSON object — handles ```json fences or stray text before/after
+  let cleaned = raw.trim();
+  // Strip code fences
+  cleaned = cleaned.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, "").trim();
+  // If there's still non-JSON text before the opening brace, find the first {
+  const firstBrace = cleaned.indexOf("{");
+  const lastBrace = cleaned.lastIndexOf("}");
+  if (firstBrace > 0 || lastBrace < cleaned.length - 1) {
+    cleaned = cleaned.slice(firstBrace, lastBrace + 1);
+  }
 
   return JSON.parse(cleaned) as OptimizationResult;
 }

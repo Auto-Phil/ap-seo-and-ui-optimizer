@@ -44,7 +44,6 @@ function AnalyzeInner() {
             title: scrapedData.title,
             metaDescription: scrapedData.metaDescription,
             h1: scrapedData.h1,
-            screenshotBase64: scrapedData.screenshotBase64,
           }),
         });
         const optJson = await optRes.json();

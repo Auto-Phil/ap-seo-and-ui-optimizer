@@ -35,9 +35,10 @@ export async function POST(req: NextRequest) {
     const data = await optimizePage(scraped);
     return NextResponse.json({ success: true, data });
   } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
     console.error("[optimize]", err);
     return NextResponse.json(
-      { success: false, error: "AI optimization failed. Please try again." },
+      { success: false, error: msg },
       { status: 500 }
     );
   }
