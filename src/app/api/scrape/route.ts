@@ -55,11 +55,11 @@ export async function POST(req: NextRequest) {
     const data = await scrapePage(url);
     return NextResponse.json({ success: true, data });
   } catch (err) {
-    console.error("[scrape]", err);
-    const message =
-      err instanceof Error && err.message.includes("timeout")
-        ? "That page took too long to load. Is it publicly accessible?"
-        : "Could not load that URL. Is it publicly accessible?";
+    const raw = err instanceof Error ? err.message : String(err);
+    console.error("[scrape]", raw);
+    const message = raw.includes("timeout")
+      ? "That page took too long to load. Is it publicly accessible?"
+      : `Scrape failed: ${raw.slice(0, 200)}`;
     return NextResponse.json({ success: false, error: message }, { status: 500 });
   }
 }
