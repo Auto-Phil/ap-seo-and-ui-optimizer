@@ -22,6 +22,8 @@ function checkRateLimit(ip: string): boolean {
   return true;
 }
 
+export const maxDuration = 60;
+
 export async function POST(req: NextRequest) {
   const ip = getIp(req);
   if (!checkRateLimit(ip)) {
