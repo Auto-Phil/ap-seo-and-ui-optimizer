@@ -1,6 +1,23 @@
 import * as cheerio from "cheerio";
 import type { ScrapedPage } from "./types";
 
+function extractBrandColors(rawHtml: string): string[] {
+  // Pull hex colors from all inline styles and <style> blocks
+  const hexMatches = rawHtml.match(/#[0-9a-fA-F]{6}\b/g) ?? [];
+  const colorCounts = new Map<string, number>();
+  for (const c of hexMatches) {
+    const normalized = c.toLowerCase();
+    // Skip pure black/white/near-black/near-white — those are structural, not brand
+    if (["#000000", "#ffffff", "#0a0a0a", "#f5f5f5", "#111111", "#eeeeee"].includes(normalized)) continue;
+    colorCounts.set(normalized, (colorCounts.get(normalized) ?? 0) + 1);
+  }
+  // Return top 8 most-used colors
+  return Array.from(colorCounts.entries())
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 8)
+    .map(([color]) => color);
+}
+
 async function getBrowser() {
   if (process.env.VERCEL) {
     const chromium = await import("@sparticuz/chromium");
@@ -33,7 +50,7 @@ export async function scrapePage(url: string): Promise<ScrapedPage> {
     );
 
     const response = await page.goto(url, {
-      waitUntil: "networkidle2",
+      waitUntil: "domcontentloaded",
       timeout: 15000,
     });
 
@@ -41,12 +58,8 @@ export async function scrapePage(url: string): Promise<ScrapedPage> {
       throw new Error(`Page returned ${response.status()}`);
     }
 
-    // Wait a bit for any late renders
-    await new Promise((r) => setTimeout(r, 2000));
-
-    // Screenshot — cap height at 3000px
-    const bodyHeight = await page.evaluate(() => document.body.scrollHeight);
-    const clipHeight = Math.min(bodyHeight, 3000);
+    // Screenshot — just the viewport (900px), no full-page crawl needed
+    const clipHeight = 900;
 
     const screenshotBuffer = await page.screenshot({
       type: "png",
@@ -89,6 +102,8 @@ export async function scrapePage(url: string): Promise<ScrapedPage> {
       htmlContent = htmlContent.slice(0, 15000);
     }
 
+    const brandColors = extractBrandColors(rawHtml);
+
     return {
       url,
       screenshotBase64,
@@ -96,6 +111,7 @@ export async function scrapePage(url: string): Promise<ScrapedPage> {
       title,
       metaDescription,
       h1,
+      brandColors,
     };
   } finally {
     if (browser) await browser.close();

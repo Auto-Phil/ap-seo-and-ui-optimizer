@@ -9,10 +9,14 @@ export interface ScrapedPage {
   title: string;
   metaDescription: string;
   h1: string;
+  brandColors: string[];
 }
 
 export interface OptimizationResult {
-  optimizedHtml: string;
+  optimizedTitle: string;
+  optimizedH1: string;
+  optimizedMeta: string;
+  optimizedCTA: string;
   improvementScore: {
     before: number;
     after: number;
