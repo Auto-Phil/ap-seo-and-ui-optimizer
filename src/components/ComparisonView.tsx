@@ -18,6 +18,7 @@ import {
 interface Props {
   scraped: ScrapedPage;
   result: OptimizationResult;
+  screenshotBase64: string | null;
 }
 
 const CALLOUT_ICONS: Record<Callout["type"], React.ReactNode> = {
@@ -41,7 +42,25 @@ const CALLOUT_BG: Record<Callout["type"], string> = {
   trust: "rgba(251,191,36,0.06)",
 };
 
-function BeforePanel({ scraped, score }: { scraped: ScrapedPage; score: number }) {
+function BeforePanel({ scraped, score, screenshotBase64 }: { scraped: ScrapedPage; score: number; screenshotBase64: string | null }) {
+  if (screenshotBase64) {
+    return (
+      <div style={{ width: "100%", height: "100%", position: "relative", borderRight: "1px solid #222", overflow: "hidden" }}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={`data:image/jpeg;base64,${screenshotBase64}`}
+          alt="Current homepage"
+          style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top", display: "block" }}
+        />
+        <div style={{ position: "absolute", inset: 0, background: "rgba(239,68,68,0.04)", pointerEvents: "none" }} />
+        <div style={{ position: "absolute", bottom: "12px", right: "12px", background: "rgba(6,6,6,0.88)", border: "1px solid #2a2a2a", borderRadius: "4px", padding: "4px 10px", backdropFilter: "blur(6px)" }}>
+          <span style={{ fontSize: "13px", fontWeight: 700, color: "#ef4444" }}>{score}</span>
+          <span style={{ fontSize: "10px", color: "#444" }}>/100</span>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div style={{ width: "100%", height: "100%", background: "#0a0a0a", display: "flex", flexDirection: "column", overflow: "hidden", borderRight: "1px solid #222" }}>
       {/* Browser chrome */}
@@ -204,7 +223,7 @@ function PreviewPanel({ result, brandColors }: { result: OptimizationResult; bra
   );
 }
 
-export default function ComparisonView({ scraped, result }: Props) {
+export default function ComparisonView({ scraped, result, screenshotBase64 }: Props) {
   const leadRef = useRef<HTMLDivElement>(null);
   const { before, after } = result.improvementScore;
   const delta = after - before;
@@ -318,7 +337,7 @@ export default function ComparisonView({ scraped, result }: Props) {
         }}
       >
         {/* Before panel */}
-        <BeforePanel scraped={scraped} score={before} />
+        <BeforePanel scraped={scraped} score={before} screenshotBase64={screenshotBase64} />
 
         {/* After panel */}
         <PreviewPanel result={result} brandColors={scraped.brandColors} />
