@@ -44,6 +44,7 @@ function AnalyzeInner() {
             title: scrapedData.title,
             metaDescription: scrapedData.metaDescription,
             h1: scrapedData.h1,
+            brandColors: scrapedData.brandColors,
           }),
         });
         const optJson = await optRes.json();
@@ -62,10 +63,10 @@ function AnalyzeInner() {
 
   if (!url) {
     return (
-      <div style={{ minHeight: "100vh", background: "#0a0a0a", display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <div style={{ minHeight: "100vh", background: "#060606", display: "flex", alignItems: "center", justifyContent: "center" }}>
         <div style={{ textAlign: "center" }}>
-          <p style={{ color: "#a0a0a0", marginBottom: "16px" }}>No URL provided.</p>
-          <a href="/" style={{ color: "#3b82f6", textDecoration: "none" }}>← Go back</a>
+          <p style={{ color: "#888", marginBottom: "16px" }}>No URL provided.</p>
+          <a href="/" style={{ color: "#14c38e", textDecoration: "none" }}>Back</a>
         </div>
       </div>
     );
@@ -73,13 +74,13 @@ function AnalyzeInner() {
 
   if (status === "error") {
     return (
-      <div style={{ minHeight: "100vh", background: "#0a0a0a", display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <div style={{ minHeight: "100vh", background: "#060606", display: "flex", alignItems: "center", justifyContent: "center" }}>
         <div style={{ textAlign: "center", maxWidth: "480px", padding: "0 24px" }}>
           <p style={{ fontSize: "18px", color: "#ef4444", marginBottom: "12px", fontWeight: 600 }}>
             Something went wrong
           </p>
-          <p style={{ color: "#a0a0a0", marginBottom: "24px" }}>{error}</p>
-          <a href="/" style={{ color: "#3b82f6", textDecoration: "none" }}>← Try a different URL</a>
+          <p style={{ color: "#888", marginBottom: "24px" }}>{error}</p>
+          <a href="/" style={{ color: "#14c38e", textDecoration: "none" }}>Try a different URL</a>
         </div>
       </div>
     );
