@@ -135,8 +135,7 @@ function BeforePanel({ scraped, score }: { scraped: ScrapedPage; score: number }
 }
 
 function PreviewPanel({ result, brandColors }: { result: OptimizationResult; brandColors: string[] }) {
-  const primaryColor = brandColors[0] ?? "#14c38e";
-  const secondaryColor = brandColors[1] ?? "#0f0f0f";
+  const accentColor = brandColors[0] ?? "#14c38e";
 
   return (
     <div style={{ width: "100%", height: "100%", background: "#0a0a0a", display: "flex", flexDirection: "column", overflow: "hidden" }}>
@@ -150,67 +149,24 @@ function PreviewPanel({ result, brandColors }: { result: OptimizationResult; bra
 
       {/* Page preview */}
       <div style={{ flex: 1, overflowY: "auto" }}>
-        {/* Hero section */}
-        <div
-          style={{
-            background: secondaryColor,
-            padding: "36px 28px",
-            borderBottom: `3px solid ${primaryColor}`,
-            position: "relative",
-          }}
-        >
-          <div
-            style={{
-              position: "absolute",
-              inset: 0,
-              background: `linear-gradient(135deg, ${primaryColor}18 0%, transparent 60%)`,
-              pointerEvents: "none",
-            }}
-          />
-          <p style={{ fontSize: "9px", fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", color: primaryColor, marginBottom: "10px", opacity: 0.85 }}>
+        {/* Hero section — always dark background, accent used for text + border only */}
+        <div style={{ background: "#0d0d0d", padding: "36px 28px", borderBottom: `3px solid ${accentColor}`, position: "relative" }}>
+          <div style={{ position: "absolute", inset: 0, background: `linear-gradient(135deg, ${accentColor}0d 0%, transparent 60%)`, pointerEvents: "none" }} />
+          <p style={{ fontSize: "9px", fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", color: accentColor, marginBottom: "10px", opacity: 0.9 }}>
             Optimized Version
           </p>
-          <h1
-            style={{
-              fontSize: "clamp(16px, 2.2vw, 22px)",
-              fontWeight: 800,
-              color: "#f0f0f0",
-              lineHeight: 1.2,
-              letterSpacing: "-0.02em",
-              marginBottom: "12px",
-              maxWidth: "400px",
-            }}
-          >
+          <h1 style={{ fontSize: "clamp(15px, 2vw, 21px)", fontWeight: 800, color: "#f0f0f0", lineHeight: 1.25, letterSpacing: "-0.02em", marginBottom: "12px", maxWidth: "400px" }}>
             {result.optimizedH1}
           </h1>
-          <p
-            style={{
-              fontSize: "12px",
-              color: "#999",
-              lineHeight: 1.6,
-              marginBottom: "20px",
-              maxWidth: "360px",
-            }}
-          >
+          <p style={{ fontSize: "12px", color: "#888", lineHeight: 1.65, marginBottom: "20px", maxWidth: "360px" }}>
             {result.optimizedMeta}
           </p>
-          <div
-            style={{
-              display: "inline-block",
-              background: primaryColor,
-              color: "#060606",
-              fontWeight: 700,
-              fontSize: "11px",
-              padding: "9px 18px",
-              borderRadius: "4px",
-              letterSpacing: "0.01em",
-            }}
-          >
+          <div style={{ display: "inline-block", background: accentColor, color: "#060606", fontWeight: 700, fontSize: "11px", padding: "9px 18px", borderRadius: "4px", letterSpacing: "0.01em" }}>
             {result.optimizedCTA}
           </div>
         </div>
 
-        {/* Below-fold indicator */}
+        {/* Below-fold placeholder rows */}
         <div style={{ padding: "18px 28px", borderBottom: "1px solid #161616" }}>
           <div style={{ display: "flex", gap: "8px", marginBottom: "10px" }}>
             {[70, 90, 55].map((w, i) => (
@@ -232,14 +188,16 @@ function PreviewPanel({ result, brandColors }: { result: OptimizationResult; bra
           </div>
         </div>
 
-        {/* Title tag preview */}
-        <div style={{ padding: "14px 28px", background: "#0c0c0c", margin: "0 0 0 0", borderTop: "1px solid #141414" }}>
-          <p style={{ fontSize: "9px", color: "#333", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: "6px" }}>
-            Title Tag
-          </p>
-          <p style={{ fontSize: "11px", color: "#60a5fa", lineHeight: 1.4 }}>
-            {result.optimizedTitle}
-          </p>
+        {/* Title tag */}
+        <div style={{ padding: "14px 28px", background: "#0c0c0c", borderTop: "1px solid #141414" }}>
+          <p style={{ fontSize: "9px", color: "#333", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: "6px" }}>Title Tag</p>
+          <p style={{ fontSize: "11px", color: "#60a5fa", lineHeight: 1.4 }}>{result.optimizedTitle}</p>
+        </div>
+
+        {/* Score */}
+        <div style={{ padding: "12px 28px", background: "#0c0c0c", display: "flex", alignItems: "center", gap: "6px" }}>
+          <span style={{ fontSize: "18px", fontWeight: 800, color: accentColor }}>{result.improvementScore.after}</span>
+          <span style={{ fontSize: "10px", color: "#333" }}>/100 optimized score</span>
         </div>
       </div>
     </div>
