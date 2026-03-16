@@ -41,6 +41,99 @@ const CALLOUT_BG: Record<Callout["type"], string> = {
   trust: "rgba(251,191,36,0.06)",
 };
 
+function BeforePanel({ scraped, score }: { scraped: ScrapedPage; score: number }) {
+  return (
+    <div style={{ width: "100%", height: "100%", background: "#0a0a0a", display: "flex", flexDirection: "column", overflow: "hidden", borderRight: "1px solid #222" }}>
+      {/* Browser chrome */}
+      <div style={{ background: "#141414", borderBottom: "1px solid #222", padding: "8px 12px", display: "flex", alignItems: "center", gap: "6px", flexShrink: 0 }}>
+        <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#333" }} />
+        <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#333" }} />
+        <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#333" }} />
+        <span style={{ flex: 1, background: "#1e1e1e", borderRadius: "3px", height: "18px", marginLeft: "8px", display: "flex", alignItems: "center", paddingLeft: "8px" }}>
+          <span style={{ fontSize: "9px", color: "#333" }}>{scraped.url}</span>
+        </span>
+      </div>
+
+      {/* Page preview */}
+      <div style={{ flex: 1, overflowY: "auto" }}>
+        {/* Hero section */}
+        <div style={{ background: "#0d0d0d", padding: "36px 28px", borderBottom: "3px solid #ef444433", position: "relative" }}>
+          <div style={{ position: "absolute", inset: 0, background: "rgba(239,68,68,0.04)", pointerEvents: "none" }} />
+          <p style={{ fontSize: "9px", fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", color: "#ef4444", marginBottom: "10px", opacity: 0.7 }}>
+            Current Version
+          </p>
+          <h1
+            style={{
+              fontSize: "clamp(14px, 2vw, 20px)",
+              fontWeight: 800,
+              color: scraped.h1 ? "#c0c0c0" : "#3a3a3a",
+              lineHeight: 1.2,
+              letterSpacing: "-0.02em",
+              marginBottom: "12px",
+              maxWidth: "400px",
+              fontStyle: scraped.h1 ? "normal" : "italic",
+            }}
+          >
+            {scraped.h1 || "No H1 found on this page"}
+          </h1>
+          <p
+            style={{
+              fontSize: "12px",
+              color: scraped.metaDescription ? "#666" : "#333",
+              lineHeight: 1.6,
+              marginBottom: "20px",
+              maxWidth: "360px",
+              fontStyle: scraped.metaDescription ? "normal" : "italic",
+            }}
+          >
+            {scraped.metaDescription || "No meta description found"}
+          </p>
+          {/* No clear CTA indicator */}
+          <div style={{ display: "inline-block", background: "#1a1a1a", border: "1px solid #2a2a2a", color: "#444", fontWeight: 600, fontSize: "11px", padding: "8px 16px", borderRadius: "4px" }}>
+            Contact Us
+          </div>
+        </div>
+
+        {/* Placeholder content rows */}
+        <div style={{ padding: "18px 28px", borderBottom: "1px solid #161616" }}>
+          <div style={{ display: "flex", gap: "8px", marginBottom: "10px" }}>
+            {[60, 80, 45].map((w, i) => (
+              <div key={i} style={{ height: "8px", width: `${w}%`, background: "#161616", borderRadius: "2px" }} />
+            ))}
+          </div>
+          <div style={{ display: "flex", gap: "8px" }}>
+            {[75, 50].map((w, i) => (
+              <div key={i} style={{ height: "8px", width: `${w}%`, background: "#141414", borderRadius: "2px" }} />
+            ))}
+          </div>
+        </div>
+
+        <div style={{ padding: "16px 28px" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "8px" }}>
+            {[0, 1, 2].map((i) => (
+              <div key={i} style={{ height: "48px", background: "#0d0d0d", borderRadius: "4px", border: "1px solid #161616" }} />
+            ))}
+          </div>
+        </div>
+
+        {/* Title tag */}
+        <div style={{ padding: "14px 28px", background: "#090909", borderTop: "1px solid #141414" }}>
+          <p style={{ fontSize: "9px", color: "#2a2a2a", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: "6px" }}>Title Tag</p>
+          <p style={{ fontSize: "11px", color: scraped.title ? "#555" : "#333", fontStyle: scraped.title ? "normal" : "italic" }}>
+            {scraped.title || "No title tag found"}
+          </p>
+        </div>
+
+        {/* Score */}
+        <div style={{ padding: "12px 28px", background: "#090909", display: "flex", alignItems: "center", gap: "6px" }}>
+          <span style={{ fontSize: "18px", fontWeight: 800, color: "#ef4444" }}>{score}</span>
+          <span style={{ fontSize: "10px", color: "#333" }}>/100 current score</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function PreviewPanel({ result, brandColors }: { result: OptimizationResult; brandColors: string[] }) {
   const primaryColor = brandColors[0] ?? "#14c38e";
   const secondaryColor = brandColors[1] ?? "#0f0f0f";
@@ -267,27 +360,7 @@ export default function ComparisonView({ scraped, result }: Props) {
         }}
       >
         {/* Before panel */}
-        <div style={{ position: "relative", borderRight: "1px solid #222", overflow: "hidden" }}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={`data:image/png;base64,${scraped.screenshotBase64}`}
-            alt="Current homepage screenshot"
-            style={{
-              width: "100%",
-              height: "100%",
-              objectFit: "cover",
-              objectPosition: "top",
-              display: "block",
-            }}
-          />
-          {/* Red tint */}
-          <div style={{ position: "absolute", inset: 0, background: "rgba(239,68,68,0.04)", pointerEvents: "none" }} />
-          {/* Score overlay */}
-          <div style={{ position: "absolute", bottom: "12px", right: "12px", background: "rgba(6,6,6,0.85)", border: "1px solid #2a2a2a", borderRadius: "4px", padding: "4px 10px", backdropFilter: "blur(6px)" }}>
-            <span style={{ fontSize: "13px", fontWeight: 700, color: "#ef4444" }}>{before}</span>
-            <span style={{ fontSize: "10px", color: "#444" }}>/100</span>
-          </div>
-        </div>
+        <BeforePanel scraped={scraped} score={before} />
 
         {/* After panel */}
         <PreviewPanel result={result} brandColors={scraped.brandColors} />
