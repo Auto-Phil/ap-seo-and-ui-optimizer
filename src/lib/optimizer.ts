@@ -94,7 +94,6 @@ async function renderToScreenshot(html: string): Promise<string> {
     await page.setContent(html, { waitUntil: "domcontentloaded" });
     const buffer = await page.screenshot({
       type: "png",
-      fullPage: true,
       clip: { x: 0, y: 0, width: 1440, height: 3000 },
     });
     return Buffer.from(buffer).toString("base64");

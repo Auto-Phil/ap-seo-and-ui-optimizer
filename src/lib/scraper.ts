@@ -31,7 +31,6 @@ export async function scrapePage(url: string): Promise<ScrapedPage> {
     // Screenshot — cap height at 3000px
     const screenshotBuffer = await page.screenshot({
       type: "png",
-      fullPage: true,
       clip: { x: 0, y: 0, width: 1440, height: 3000 },
     });
     const screenshotBase64 = Buffer.from(screenshotBuffer).toString("base64");
