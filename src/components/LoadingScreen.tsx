@@ -11,22 +11,43 @@ const MESSAGES = [
   "Almost ready...",
 ];
 
+const FACTS = [
+  "Pages that load in under 2 seconds convert 15% better than slow ones.",
+  "75% of users never scroll past the first page of Google results.",
+  "A clear headline above the fold can increase conversions by up to 89%.",
+  "AI can analyze and rewrite a homepage in the time it takes to make coffee.",
+  "Sites with a single focused CTA convert 371% better than those with multiple.",
+  "53% of mobile users abandon a page that takes longer than 3 seconds to load.",
+  "Adding social proof near a CTA can boost click-through rates by 34%.",
+  "Businesses that blog get 55% more website visitors than those that don't.",
+  "The average webpage title that ranks #1 on Google is 57 characters long.",
+  "Automating lead follow-up within 5 minutes increases conversion rates by 9x.",
+];
+
 interface LoadingScreenProps {
   phase: "scraping" | "optimizing";
 }
 
 export function LoadingScreen({ phase }: LoadingScreenProps) {
   const [msgIndex, setMsgIndex] = useState(0);
+  const [factIndex, setFactIndex] = useState(() => Math.floor(Math.random() * FACTS.length));
 
   useEffect(() => {
     if (phase === "optimizing") setMsgIndex(2);
   }, [phase]);
 
   useEffect(() => {
-    const interval = setInterval(() => {
+    const msgInterval = setInterval(() => {
       setMsgIndex((i) => Math.min(i + 1, MESSAGES.length - 1));
     }, 3000);
-    return () => clearInterval(interval);
+    return () => clearInterval(msgInterval);
+  }, []);
+
+  useEffect(() => {
+    const factInterval = setInterval(() => {
+      setFactIndex((i) => (i + 1) % FACTS.length);
+    }, 5000);
+    return () => clearInterval(factInterval);
   }, []);
 
   return (
@@ -38,6 +59,7 @@ export function LoadingScreen({ phase }: LoadingScreenProps) {
       alignItems: "center",
       justifyContent: "center",
       gap: 32,
+      padding: "24px 16px",
     }}>
       {/* Spinner ring */}
       <div style={{ position: "relative", width: 64, height: 64 }}>
@@ -83,6 +105,33 @@ export function LoadingScreen({ phase }: LoadingScreenProps) {
           />
         ))}
       </div>
+
+      {/* Did you know */}
+      <motion.div
+        style={{
+          marginTop: 16,
+          maxWidth: 420,
+          backgroundColor: "var(--surface)",
+          border: "1px solid var(--border)",
+          borderRadius: 12,
+          padding: "16px 20px",
+          textAlign: "center",
+        }}
+      >
+        <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--accent)", marginBottom: 8 }}>
+          Did you know?
+        </p>
+        <motion.p
+          key={factIndex}
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -6 }}
+          transition={{ duration: 0.4 }}
+          style={{ fontSize: 14, color: "var(--text-secondary)", lineHeight: 1.6 }}
+        >
+          {FACTS[factIndex]}
+        </motion.p>
+      </motion.div>
 
       <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </div>

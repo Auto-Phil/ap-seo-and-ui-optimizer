@@ -107,7 +107,7 @@ export default function Home() {
             }}
             onFocus={(e) => {
               (e.currentTarget as HTMLDivElement).style.borderColor = "var(--accent)";
-              (e.currentTarget as HTMLDivElement).style.boxShadow = "0 0 0 3px rgba(59,130,246,0.15)";
+              (e.currentTarget as HTMLDivElement).style.boxShadow = "0 0 0 3px rgba(46,139,122,0.2)";
             }}
             onBlur={(e) => {
               (e.currentTarget as HTMLDivElement).style.borderColor = error ? "var(--danger)" : "var(--border)";
