@@ -19,7 +19,6 @@ export interface Callout {
 
 export interface OptimizationResult {
   optimizedHtml: string;
-  optimizedScreenshotBase64: string;
   improvementScore: {
     before: number;
     after: number;

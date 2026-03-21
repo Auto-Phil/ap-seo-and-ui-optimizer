@@ -1,5 +1,4 @@
 import Anthropic from "@anthropic-ai/sdk";
-import { getBrowser } from "./browser";
 import type { ScrapedPage, OptimizationResult } from "./types";
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
@@ -87,22 +86,6 @@ async function callClaude(scraped: ScrapedPage): Promise<OptimizationResult> {
   return JSON.parse(cleaned) as OptimizationResult;
 }
 
-async function renderToScreenshot(html: string): Promise<string> {
-  let browser;
-  try {
-    browser = await getBrowser();
-    const page = await browser.newPage();
-    await page.setContent(html, { waitUntil: "domcontentloaded" });
-    const buffer = await page.screenshot({
-      type: "png",
-      clip: { x: 0, y: 0, width: 1440, height: 3000 },
-    });
-    return Buffer.from(buffer).toString("base64");
-  } finally {
-    if (browser) await browser.close();
-  }
-}
-
 export async function optimizePage(scraped: ScrapedPage): Promise<OptimizationResult> {
   let result = await callClaude(scraped);
 
@@ -116,7 +99,5 @@ export async function optimizePage(scraped: ScrapedPage): Promise<OptimizationRe
     result = await callClaude(scraped);
   }
 
-  const optimizedScreenshotBase64 = await renderToScreenshot(result.optimizedHtml);
-
-  return { ...result, optimizedScreenshotBase64 };
+  return result;
 }

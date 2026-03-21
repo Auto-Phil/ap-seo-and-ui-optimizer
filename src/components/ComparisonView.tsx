@@ -112,11 +112,10 @@ export function ComparisonView({ scraped, result }: ComparisonViewProps) {
             <span style={{ color: "#22c55e", fontSize: 13, fontWeight: 600 }}>{after}/100</span>
           </div>
           <div style={{ flex: 1, overflow: "auto" }}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={`data:image/png;base64,${result.optimizedScreenshotBase64}`}
-              alt="Optimized homepage screenshot"
-              style={{ width: "100%", display: "block" }}
+            <iframe
+              srcDoc={result.optimizedHtml}
+              style={{ width: "100%", height: "3000px", border: "none", display: "block" }}
+              title="Optimized version"
             />
           </div>
         </div>
