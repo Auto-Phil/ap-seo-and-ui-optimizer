@@ -89,7 +89,7 @@ export default function Home() {
           maxWidth: 480,
         }}>
           Paste your URL. In 15 seconds, see your page rebuilt for SEO and
-          conversions — side by side with your original.
+          conversions, side by side with your original.
         </motion.p>
 
         {/* URL Input */}

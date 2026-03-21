@@ -33,8 +33,9 @@ REQUIREMENTS FOR THE REBUILT PAGE:
 - Structure content so the most important information appears first (inverted pyramid)
 - Use semantic HTML5 elements (<header>, <main>, <section>, <footer>)
 - Include inline CSS for styling — make it look clean and professional (dark or light theme matching the original brand)
-- The page must look like it was designed by a professional agency — not a template
+- The page must look like it was designed by a professional agency, not a template
 - Make it genuinely beautiful: proper spacing, typography scale, visual hierarchy
+- Never use em dashes (—) anywhere in the copy; use commas, periods, or rewrite the sentence instead
 
 SCORING:
 Score the original page on:
