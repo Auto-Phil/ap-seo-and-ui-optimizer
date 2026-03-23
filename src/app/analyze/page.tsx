@@ -74,6 +74,12 @@ function AnalyzePage() {
         .trim();
 
       const data = JSON.parse(cleaned);
+      if (data.__error) {
+        setPhase("error");
+        setErrorMsg("AI optimization failed. Please try again.");
+        console.error("Optimizer error:", data.__error);
+        return;
+      }
       setResult(data);
       setPhase("revealing");
     } catch {

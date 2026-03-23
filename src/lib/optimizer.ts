@@ -92,7 +92,11 @@ export function streamOptimize(scraped: ScrapedPage): ReadableStream<Uint8Array>
         }
         controller.close();
       } catch (err) {
-        controller.error(err);
+        console.error("streamOptimize error:", err);
+        controller.enqueue(
+          encoder.encode(JSON.stringify({ __error: String(err) }))
+        );
+        controller.close();
       }
     },
   });
