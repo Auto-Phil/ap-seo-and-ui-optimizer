@@ -68,36 +68,31 @@ RESPONSE FORMAT — return ONLY valid JSON, no markdown, no explanation:
 }`;
 }
 
-async function callClaude(scraped: ScrapedPage): Promise<OptimizationResult> {
-  const response = await client.messages.create({
-    model: "claude-sonnet-4-6",
-    max_tokens: 5000,
-    system: SYSTEM_PROMPT,
-    messages: [{ role: "user", content: buildPrompt(scraped) }],
+export function streamOptimize(scraped: ScrapedPage): ReadableStream<Uint8Array> {
+  const encoder = new TextEncoder();
+
+  return new ReadableStream({
+    async start(controller) {
+      try {
+        const stream = client.messages.stream({
+          model: "claude-sonnet-4-6",
+          max_tokens: 5000,
+          system: SYSTEM_PROMPT,
+          messages: [{ role: "user", content: buildPrompt(scraped) }],
+        });
+
+        for await (const chunk of stream) {
+          if (
+            chunk.type === "content_block_delta" &&
+            chunk.delta.type === "text_delta"
+          ) {
+            controller.enqueue(encoder.encode(chunk.delta.text));
+          }
+        }
+        controller.close();
+      } catch (err) {
+        controller.error(err);
+      }
+    },
   });
-
-  const raw = response.content[0].type === "text" ? response.content[0].text : "";
-  const cleaned = raw
-    .replace(/^```json\n?/, "")
-    .replace(/^```\n?/, "")
-    .replace(/\n?```$/, "")
-    .trim();
-
-  return JSON.parse(cleaned) as OptimizationResult;
-}
-
-export async function optimizePage(scraped: ScrapedPage): Promise<OptimizationResult> {
-  let result = await callClaude(scraped);
-
-  // Quality checks — retry once if they fail
-  const needsRetry =
-    !result.optimizedHtml?.includes("<!DOCTYPE html>") ||
-    result.improvementScore?.after <= result.improvementScore?.before ||
-    !result.callouts || result.callouts.length < 3;
-
-  if (needsRetry) {
-    result = await callClaude(scraped);
-  }
-
-  return result;
 }

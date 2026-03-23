@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { optimizePage } from "@/lib/optimizer";
+import { streamOptimize } from "@/lib/optimizer";
 import type { ScrapedPage } from "@/lib/types";
 
 export const runtime = "nodejs";
@@ -26,14 +26,17 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const data = await optimizePage({
+    const stream = streamOptimize({
       url,
       htmlContent,
       title: title ?? "",
       metaDescription: metaDescription ?? "",
       h1: h1 ?? "",
     });
-    return NextResponse.json({ success: true, data });
+
+    return new Response(stream, {
+      headers: { "Content-Type": "text/plain; charset=utf-8" },
+    });
   } catch (err) {
     console.error("Optimize error:", err);
     return NextResponse.json(

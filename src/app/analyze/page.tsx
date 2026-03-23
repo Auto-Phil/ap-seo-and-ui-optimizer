@@ -40,7 +40,7 @@ function AnalyzePage() {
       return;
     }
 
-    // Step 2: Optimize
+    // Step 2: Optimize (streamed)
     setPhase("optimizing");
     try {
       const res = await fetch("/api/optimize", {
@@ -48,9 +48,33 @@ function AnalyzePage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(scrapeData),
       });
-      const json = await res.json();
-      if (!json.success) { setPhase("error"); setErrorMsg(json.error ?? "AI optimization failed."); return; }
-      setResult(json.data);
+
+      if (!res.ok || !res.body) {
+        const json = await res.json().catch(() => ({}));
+        setPhase("error");
+        setErrorMsg((json as { error?: string }).error ?? "AI optimization failed.");
+        return;
+      }
+
+      // Accumulate streamed text
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let accumulated = "";
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        accumulated += decoder.decode(value, { stream: true });
+      }
+
+      // Parse JSON from accumulated stream
+      const cleaned = accumulated
+        .replace(/^```json\n?/, "")
+        .replace(/^```\n?/, "")
+        .replace(/\n?```$/, "")
+        .trim();
+
+      const data = JSON.parse(cleaned);
+      setResult(data);
       setPhase("revealing");
     } catch {
       setPhase("error");
