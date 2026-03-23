@@ -74,19 +74,20 @@ export function streamOptimize(scraped: ScrapedPage): ReadableStream<Uint8Array>
   return new ReadableStream({
     async start(controller) {
       try {
-        const stream = client.messages.stream({
+        const stream = await client.messages.create({
           model: "claude-sonnet-4-6",
           max_tokens: 5000,
+          stream: true,
           system: SYSTEM_PROMPT,
           messages: [{ role: "user", content: buildPrompt(scraped) }],
         });
 
-        for await (const chunk of stream) {
+        for await (const event of stream) {
           if (
-            chunk.type === "content_block_delta" &&
-            chunk.delta.type === "text_delta"
+            event.type === "content_block_delta" &&
+            event.delta.type === "text_delta"
           ) {
-            controller.enqueue(encoder.encode(chunk.delta.text));
+            controller.enqueue(encoder.encode(event.delta.text));
           }
         }
         controller.close();
