@@ -3,7 +3,7 @@ import { scrapePage } from "@/lib/scraper";
 import { isValidUrl, normalizeUrl } from "@/lib/utils";
 
 export const runtime = "nodejs";
-export const maxDuration = 30;
+export const maxDuration = 60;
 
 // Simple in-memory rate limiter: 5 req/min per IP
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
@@ -66,7 +66,7 @@ export async function POST(request: NextRequest) {
     const message =
       err instanceof Error ? err.message : "Unknown error";
 
-    if (message.includes("timeout") || message.includes("Timeout")) {
+    if (message.includes("timeout") || message.includes("Timeout") || message.includes("aborted") || message.includes("AbortError")) {
       return NextResponse.json(
         { success: false, error: "That page took too long to load. Is it publicly accessible?" },
         { status: 504 }

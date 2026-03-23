@@ -19,14 +19,14 @@ export async function scrapePage(url: string): Promise<ScrapedPage> {
 
   const [screenshotRes, htmlRes] = await Promise.all([
     fetch(`https://api.screenshotone.com/take?${params}`, {
-      signal: AbortSignal.timeout(25000),
+      signal: AbortSignal.timeout(50000),
     }),
     fetch(url, {
       headers: {
         "User-Agent":
           "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
       },
-      signal: AbortSignal.timeout(10000),
+      signal: AbortSignal.timeout(15000),
     }),
   ]);
 
