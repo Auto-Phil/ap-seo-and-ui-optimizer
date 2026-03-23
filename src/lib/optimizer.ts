@@ -70,8 +70,8 @@ RESPONSE FORMAT — return ONLY valid JSON, no markdown, no explanation:
 
 async function callClaude(scraped: ScrapedPage): Promise<OptimizationResult> {
   const response = await client.messages.create({
-    model: "claude-opus-4-6",
-    max_tokens: 8000,
+    model: "claude-sonnet-4-6",
+    max_tokens: 5000,
     system: SYSTEM_PROMPT,
     messages: [{ role: "user", content: buildPrompt(scraped) }],
   });
