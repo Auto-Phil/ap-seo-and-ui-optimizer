@@ -4,7 +4,6 @@ export interface AnalysisRequest {
 
 export interface ScrapedPage {
   url: string;
-  screenshotBase64: string;
   htmlContent: string;
   title: string;
   metaDescription: string;

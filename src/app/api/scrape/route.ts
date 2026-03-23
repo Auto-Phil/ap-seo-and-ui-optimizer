@@ -3,7 +3,7 @@ import { scrapePage } from "@/lib/scraper";
 import { isValidUrl, normalizeUrl } from "@/lib/utils";
 
 export const runtime = "nodejs";
-export const maxDuration = 60;
+export const maxDuration = 15;
 
 // Simple in-memory rate limiter: 5 req/min per IP
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>();

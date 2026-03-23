@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const { url, htmlContent, title, metaDescription, h1, screenshotBase64 } = body;
+  const { url, htmlContent, title, metaDescription, h1 } = body;
 
   if (!url || !htmlContent) {
     return NextResponse.json(
@@ -32,7 +32,6 @@ export async function POST(request: NextRequest) {
       title: title ?? "",
       metaDescription: metaDescription ?? "",
       h1: h1 ?? "",
-      screenshotBase64: screenshotBase64 ?? "",
     });
     return NextResponse.json({ success: true, data });
   } catch (err) {

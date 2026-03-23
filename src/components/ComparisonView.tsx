@@ -19,7 +19,7 @@ const calloutIcons: Record<string, string> = {
 };
 
 const calloutColors: Record<string, string> = {
-  seo: "#3b82f6",
+  seo: "var(--accent)",
   conversion: "#22c55e",
   ux: "#a855f7",
   trust: "#f59e0b",
@@ -43,7 +43,7 @@ export function ComparisonView({ scraped, result }: ComparisonViewProps) {
         position: "sticky",
         top: 0,
         zIndex: 20,
-        backgroundColor: "rgba(10,10,10,0.95)",
+        backgroundColor: "rgba(10,13,12,0.95)",
         borderBottom: "1px solid var(--border)",
         backdropFilter: "blur(8px)",
         display: "flex",
@@ -77,52 +77,23 @@ export function ComparisonView({ scraped, result }: ComparisonViewProps) {
         </div>
       </div>
 
-      {/* Split panel */}
-      <div style={{
-        display: "grid",
-        gridTemplateColumns: "1fr 1fr",
-        height: "calc(100vh - 56px - 1px)",
-      }}
-        className="split-panel"
-      >
-        {/* Before */}
-        <div style={{ display: "flex", flexDirection: "column", borderRight: "1px solid var(--border)" }}>
-          <div style={{ padding: "10px 16px", borderBottom: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-            <span style={{ fontSize: 12, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.06em" }}>
-              Your current homepage
-            </span>
-            <span style={{ color: "#ef4444", fontSize: 13, fontWeight: 600 }}>{before}/100</span>
-          </div>
-          <div style={{ flex: 1, overflow: "auto" }}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={`data:image/png;base64,${scraped.screenshotBase64}`}
-              alt="Current homepage screenshot"
-              style={{ width: "100%", display: "block" }}
-            />
-          </div>
+      {/* Optimized page */}
+      <div style={{ borderBottom: "1px solid var(--border)" }}>
+        <div style={{ padding: "10px 16px", borderBottom: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <span style={{ fontSize: 12, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.06em" }}>
+            Optimized by w.max
+          </span>
+          <span style={{ color: "#22c55e", fontSize: 13, fontWeight: 600 }}>{after}/100</span>
         </div>
-
-        {/* After */}
-        <div style={{ display: "flex", flexDirection: "column" }}>
-          <div style={{ padding: "10px 16px", borderBottom: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-            <span style={{ fontSize: 12, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.06em" }}>
-              Optimized by w.max
-            </span>
-            <span style={{ color: "#22c55e", fontSize: 13, fontWeight: 600 }}>{after}/100</span>
-          </div>
-          <div style={{ flex: 1, overflow: "auto" }}>
-            <iframe
-              srcDoc={result.optimizedHtml}
-              style={{ width: "100%", height: "3000px", border: "none", display: "block" }}
-              title="Optimized version"
-            />
-          </div>
-        </div>
+        <iframe
+          srcDoc={result.optimizedHtml}
+          style={{ width: "100%", height: "80vh", border: "none", display: "block" }}
+          title="Optimized version"
+        />
       </div>
 
-      {/* Callouts strip */}
-      <div style={{ padding: "32px 24px", borderTop: "1px solid var(--border)" }}>
+      {/* Callouts */}
+      <div style={{ padding: "32px 24px", borderBottom: "1px solid var(--border)" }}>
         <p style={{ fontSize: 12, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 16 }}>
           What changed
         </p>
@@ -136,12 +107,12 @@ export function ComparisonView({ scraped, result }: ComparisonViewProps) {
               style={{
                 minWidth: 200,
                 maxWidth: 240,
+                flexShrink: 0,
                 backgroundColor: "var(--surface)",
                 border: "1px solid var(--border)",
-                borderLeft: `3px solid ${calloutColors[callout.type] ?? "#2a2a2a"}`,
+                borderLeft: `3px solid ${calloutColors[callout.type] ?? "var(--accent)"}`,
                 borderRadius: 10,
                 padding: "14px 16px",
-                flexShrink: 0,
               }}
             >
               <p style={{ fontSize: 18, marginBottom: 6 }}>{calloutIcons[callout.type]}</p>
@@ -176,15 +147,6 @@ export function ComparisonView({ scraped, result }: ComparisonViewProps) {
       <div ref={leadRef}>
         <LeadCapture url={scraped.url} />
       </div>
-
-      <style>{`
-        @media (max-width: 768px) {
-          .split-panel {
-            grid-template-columns: 1fr !important;
-            height: auto !important;
-          }
-        }
-      `}</style>
     </div>
   );
 }
