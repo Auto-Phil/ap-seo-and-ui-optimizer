@@ -1,54 +1,78 @@
-# Handoff — w.max / ap-seo-and-ui-optimizer
+# Handoff — ap-seo-and-ui-optimizer
 
-**Session date:** 2026-03-20
-**Status:** Ready to Continue
+**Session date:** 2026-03-23
+**Status:** Blocked — Anthropic API credits issue
 
 ---
 
 ## What We Were Building
 
-A free homepage audit tool that scrapes any URL with Puppeteer, sends the HTML + screenshot to Claude, and renders a before/after comparison with scores and callouts. The "after" side was previously rendered as a sandboxed iframe (messy, fonts broken, resources blocked) — this session fixed that by using Puppeteer to render the AI-generated HTML to a screenshot instead.
+A free homepage audit tool (w.max) that fetches any URL, sends the HTML to Claude, and returns a rebuilt version with before/after scores and improvement callouts. Built with Next.js, deployed on Vercel, owned under Auto-Phil LLC.
 
 ---
 
 ## Where We Stopped
 
-All code changes are complete and the build is clean (`npm run build` passed). The repo was just initialized and pushed to GitHub at https://github.com/Auto-Phil/ap-seo-and-ui-optimizer for the first time.
+The app is fully built and deployed. The only thing blocking it from working is an **Anthropic API credit balance error**. The code is correct and streaming is working — Claude is rejecting the request before generating anything.
+
+---
+
+## The Blocker
+
+Error from Vercel logs:
+```
+Error: 400 {"type":"error","error":{"type":"invalid_request_error",
+"message":"Your credit balance is too low to access the Anthropic API."}}
+```
+
+**Organization ID in the error:** `afd758e0-b7e4-4de8-be22-5c95f23447fb`
+
+Zack added $5 to console.anthropic.com but the error persisted. Most likely cause: the API key in Vercel belongs to a different workspace/org than where the credits were added.
+
+**Next action to resolve:**
+1. Go to console.anthropic.com → API Keys
+2. Find the key named `apseoui-api-key`
+3. Confirm it belongs to org `afd758e0-b7e4-4de8-be22-5c95f23447fb`
+4. Go to Plans & Billing on THAT org and confirm balance shows $5+
+5. If balance is there but still failing, create a brand new API key from that org, update it in Vercel env vars, and redeploy
 
 ---
 
 ## What Is Done
 
-- Created `src/lib/browser.ts` — shared `getBrowser()` util (dev: full puppeteer, prod: puppeteer-core + @sparticuz/chromium)
-- Updated `src/lib/scraper.ts` — removed duplicate `getBrowser()`, now imports from `browser.ts`
-- Updated `src/lib/optimizer.ts` — after Claude returns optimized HTML, renders it via `page.setContent()` + Puppeteer screenshot; attaches `optimizedScreenshotBase64` to result
-- Updated `src/lib/types.ts` — added `optimizedScreenshotBase64: string` to `OptimizationResult`
-- Updated `src/components/ComparisonView.tsx` — replaced `<iframe srcDoc>` with `<img>` using the new screenshot (both panels now consistent pixel-rendered images)
-- Full build verified clean
+- Full Next.js app built and deployed to Vercel
+- **Scraper** (`src/lib/scraper.ts`) — plain `fetch` + cheerio, no browser, sub-second
+- **Optimizer** (`src/lib/optimizer.ts`) — Claude Sonnet 4-6, streaming via `messages.create({ stream: true })`, errors encoded as data (no crash)
+- **Streaming route** (`src/app/api/optimize/route.ts`) — returns `ReadableStream`, frontend accumulates and parses JSON on close
+- **UI** — Auto-Phil teal color scheme, "Did you know" facts on loading screen, single-panel optimized output with score reveal animation + callouts
+- **GitHub** — https://github.com/Auto-Phil/ap-seo-and-ui-optimizer (main branch)
+- Build is clean, all TypeScript passes
 
 ---
 
 ## What Is NOT Done Yet
 
-- No deployment configured yet (Vercel or otherwise) — env vars need to be set
-- No `.env.local` committed (correct — should stay out of git)
-- Lead capture (`/api/lead`) not reviewed this session — unknown status
-- No custom domain set up
+- Unblocking the Anthropic API credits (see blocker above)
+- End-to-end test on a real URL once credits are confirmed
+- Verify the score reveal animation looks good in production
 
 ---
 
 ## Next Action (Start Here)
 
-> Deploy to Vercel: run `vercel` from the project root, set `ANTHROPIC_API_KEY` as an environment variable in the Vercel dashboard, and confirm the scrape + optimize flow works end-to-end in production.
+> Resolve the Anthropic billing issue: go to console.anthropic.com, confirm the `apseoui-api-key` key and the $5 credit are on the same org (`afd758e0`). If unsure, create a fresh API key, paste it into Vercel → Settings → Environment Variables → `ANTHROPIC_API_KEY`, and redeploy.
 
 ---
 
 ## Key Decisions Made This Session
 
-- Both before/after comparison panels now use Puppeteer screenshots (not iframe) for visual consistency
-- `getBrowser()` extracted to a shared `src/lib/browser.ts` to avoid duplication between scraper and optimizer
-- `page.setContent()` used for rendering optimized HTML (no network requests, fast ~3–5s)
-- Puppeteer render happens server-side inside the `/api/optimize` route (no extra client round trip)
+- Removed Puppeteer entirely — was causing every timeout/crash on Vercel serverless
+- Removed ScreenshotOne — also too slow for Vercel's limits
+- Removed "before" screenshot panel — now shows only the AI-optimized page + report
+- Scraper is now a plain `fetch()` call — no external APIs, no browser, sub-second
+- Switched from Opus to Sonnet for speed
+- Implemented streaming so Claude's output flows token-by-token (no 60s wall)
+- Brand colors: Auto-Phil teal `#2e8b7a` across all accents
 
 ---
 
@@ -56,35 +80,45 @@ All code changes are complete and the build is clean (`npm run build` passed). T
 
 | File | What Changed |
 |------|--------------|
-| `src/lib/browser.ts` | Created — shared getBrowser() util |
-| `src/lib/scraper.ts` | Removed inline getBrowser(), imports from browser.ts |
-| `src/lib/optimizer.ts` | Added renderToScreenshot(), attached optimizedScreenshotBase64 to result |
-| `src/lib/types.ts` | Added optimizedScreenshotBase64: string to OptimizationResult |
-| `src/components/ComparisonView.tsx` | Replaced iframe with img tag using optimizedScreenshotBase64 |
+| `src/lib/scraper.ts` | Plain fetch + cheerio, no Puppeteer or ScreenshotOne |
+| `src/lib/optimizer.ts` | Streaming via create({stream:true}), errors as encoded data |
+| `src/lib/types.ts` | Removed screenshotBase64 from ScrapedPage |
+| `src/app/api/scrape/route.ts` | maxDuration reduced to 15s |
+| `src/app/api/optimize/route.ts` | Returns ReadableStream response |
+| `src/app/analyze/page.tsx` | Reads stream, accumulates, parses JSON on close |
+| `src/components/RevealAnimation.tsx` | Redesigned: score count-up → page reveal → callouts |
+| `src/components/ComparisonView.tsx` | Single panel: full-width iframe + callouts + lead capture |
+| `src/app/globals.css` | Auto-Phil teal color scheme |
+| `src/components/LoadingScreen.tsx` | Did-you-know facts rotating every 5s |
+| `next.config.ts` | Stripped to empty config (no Puppeteer packages needed) |
+| `HANDOFF.md` | This file |
 
 ---
 
 ## Known Issues / Watch Out For
 
-- Vercel's max function duration is 60s for the optimize route — Claude + Puppeteer render runs sequentially, should stay under that but watch it on cold starts
-- `@sparticuz/chromium` is required for Vercel production (included in dependencies); local dev uses full `puppeteer`
-- The optimize route has `maxDuration = 60` set — don't lower it
-- The scrape route has `maxDuration = 30` — screenshotting tall pages (clip at 3000px) should stay under that
+- Anthropic credits must be on the same org as the API key — this tripped us up
+- Vercel Hobby plan has 60s function limit — streaming keeps the connection alive past this, but if streaming itself fails the limit still applies
+- The `SCREENSHOTONE_ACCESS_KEY` env var in Vercel is no longer needed and can be deleted
+- Puppeteer, puppeteer-core, @sparticuz/chromium have all been removed from package.json
 
 ---
 
 ## How to Resume
 
 1. Open a new Claude Code terminal in `C:\Users\whitl\wmax`
-2. Say: "Read HANDOFF.md and let's continue"
+2. Say: **"Read HANDOFF.md and let's continue"**
 3. Claude will orient immediately — no re-explaining needed
 
 ---
 
 ## Environment Notes
 
-- **Platform:** Vercel (target) — not yet deployed
+- **Platform:** Vercel (deployed, auto-deploys from main branch)
 - **Dev command:** `npm run dev`
-- **Branch:** main (freshly initialized)
-- **Env vars needed:** `ANTHROPIC_API_KEY` (not committed, must be set in Vercel dashboard)
+- **Branch:** main
+- **Env vars needed:**
+  - `ANTHROPIC_API_KEY` — must match the org with active credits
+  - `SCREENSHOTONE_ACCESS_KEY` — no longer needed, safe to delete
 - **GitHub:** https://github.com/Auto-Phil/ap-seo-and-ui-optimizer
+- **Vercel project:** ap-seo-and-ui-optimizer
