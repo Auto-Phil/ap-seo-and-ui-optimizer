@@ -5,89 +5,99 @@ import { motion } from "framer-motion";
 import type { ScrapedPage, OptimizationResult, Callout } from "@/lib/types";
 import AnimatedNumber from "./AnimatedNumber";
 import LeadCapture from "./LeadCapture";
-import {
-  ArrowLeft,
-  Search,
-  Analytics,
-  Laptop,
-  Certificate,
-  ChevronDown,
-} from "@carbon/icons-react";
+import { ArrowLeft, Search, Analytics, Laptop, Certificate, ChevronDown } from "@carbon/icons-react";
 
 interface Props {
   scraped: ScrapedPage;
   result: OptimizationResult;
 }
 
-const CALLOUT_ICONS: Record<Callout["type"], React.ReactNode> = {
-  seo: <Search size={18} />,
-  conversion: <Analytics size={18} />,
-  ux: <Laptop size={18} />,
-  trust: <Certificate size={18} />,
+// Palette — not pure black, slightly warm-dark slate
+const C = {
+  bg: "#0f0f13",
+  surface: "#16161c",
+  surfaceHigh: "#1e1e28",
+  border: "#28283a",
+  borderLight: "#22222e",
+  text: "#e8e8f0",
+  textMuted: "#8888a0",
+  textFaint: "#45455a",
+  accent: "#22d3a0",       // slightly cooler green — less neon
+  accentDim: "rgba(34,211,160,0.10)",
+  accentBorder: "rgba(34,211,160,0.22)",
+  red: "#f87171",
+  redDim: "rgba(248,113,113,0.08)",
 };
 
-const CALLOUT_COLORS: Record<Callout["type"], string> = {
-  seo: "#14c38e",
-  conversion: "#60a5fa",
-  ux: "#a78bfa",
-  trust: "#fbbf24",
+const TAG_COLORS: Record<Callout["type"], { fg: string; bg: string; border: string }> = {
+  seo:        { fg: "#22d3a0", bg: "rgba(34,211,160,0.08)",  border: "rgba(34,211,160,0.18)" },
+  conversion: { fg: "#818cf8", bg: "rgba(129,140,248,0.08)", border: "rgba(129,140,248,0.18)" },
+  ux:         { fg: "#c084fc", bg: "rgba(192,132,252,0.08)", border: "rgba(192,132,252,0.18)" },
+  trust:      { fg: "#fbbf24", bg: "rgba(251,191,36,0.08)",  border: "rgba(251,191,36,0.18)" },
 };
 
-const CALLOUT_LABELS: Record<Callout["type"], string> = {
-  seo: "SEO",
-  conversion: "Conversion",
-  ux: "UX",
-  trust: "Trust",
+const TAG_ICONS: Record<Callout["type"], React.ReactNode> = {
+  seo:        <Search size={14} />,
+  conversion: <Analytics size={14} />,
+  ux:         <Laptop size={14} />,
+  trust:      <Certificate size={14} />,
 };
 
-function clean(text: string): string {
+const TAG_LABELS: Record<Callout["type"], string> = {
+  seo: "SEO", conversion: "Conversion", ux: "UX", trust: "Trust",
+};
+
+function clean(text: string) {
   return text.replace(/\s*—\s*/g, ", ").replace(/–/g, "-");
 }
 
-function Bullets({ text }: { text: string }) {
-  const points = text.split("|").map((s) => clean(s.trim())).filter(Boolean);
+function Bullets({ text, color }: { text: string; color: string }) {
+  const points = text.split("|").map(s => clean(s.trim())).filter(Boolean);
   return (
-    <ul style={{ margin: 0, padding: 0, listStyle: "none", display: "flex", flexDirection: "column", gap: "10px" }}>
-      {points.map((point, i) => (
-        <li key={i} style={{ display: "flex", alignItems: "flex-start", gap: "10px" }}>
-          <span style={{ color: "#14c38e", fontSize: "16px", lineHeight: "1.6", flexShrink: 0, marginTop: "1px" }}>•</span>
-          <span style={{ fontSize: "15px", color: "#ccc", lineHeight: 1.65 }}>{point}</span>
+    <ul style={{ margin: 0, padding: 0, listStyle: "none", display: "flex", flexDirection: "column", gap: "12px" }}>
+      {points.map((p, i) => (
+        <li key={i} style={{ display: "flex", alignItems: "flex-start", gap: "12px" }}>
+          <span style={{ width: 6, height: 6, borderRadius: "50%", background: color, flexShrink: 0, marginTop: "9px" }} />
+          <span style={{ fontSize: "15px", color: C.textMuted, lineHeight: 1.7 }}>{p}</span>
         </li>
       ))}
     </ul>
   );
 }
 
+function SectionLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <p style={{ fontSize: "13px", fontWeight: 600, color: C.textFaint, marginBottom: "20px", letterSpacing: "0.01em" }}>
+      {children}
+    </p>
+  );
+}
+
 function FieldCard({ label, before, after, delay }: { label: string; before: string; after: string; delay: number }) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 14 }}
+      initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay }}
-      style={{ background: "#0d0d0d", border: "1px solid #252525", borderRadius: "10px", overflow: "hidden" }}
+      style={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: "12px", overflow: "hidden" }}
     >
-      <div style={{ padding: "13px 24px", borderBottom: "1px solid #1e1e1e", background: "#0a0a0a" }}>
-        <span style={{ fontSize: "11px", fontWeight: 700, letterSpacing: "0.16em", textTransform: "uppercase", color: "#14c38e" }}>
-          {label}
-        </span>
+      {/* Label row */}
+      <div style={{ padding: "14px 28px", borderBottom: `1px solid ${C.borderLight}` }}>
+        <span style={{ fontSize: "13px", fontWeight: 600, color: C.textMuted }}>{label}</span>
       </div>
 
+      {/* Before / After columns */}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr" }}>
-        <div style={{ padding: "22px 24px", borderRight: "1px solid #1e1e1e" }}>
-          <p style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", color: "#666", marginBottom: "10px" }}>
-            Current
-          </p>
-          <p style={{ fontSize: "15px", color: before ? "#aaa" : "#555", lineHeight: 1.6, fontStyle: before ? "normal" : "italic" }}>
+        <div style={{ padding: "24px 28px", borderRight: `1px solid ${C.borderLight}` }}>
+          <p style={{ fontSize: "11px", fontWeight: 600, color: C.textFaint, marginBottom: "10px", letterSpacing: "0.04em" }}>Current</p>
+          <p style={{ fontSize: "15px", color: before ? C.textMuted : C.textFaint, lineHeight: 1.65, fontStyle: before ? "normal" : "italic" }}>
             {before || "Not detected"}
           </p>
         </div>
-        <div style={{ padding: "22px 24px", background: "rgba(20,195,142,0.03)" }}>
-          <p style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", color: "#14c38e", marginBottom: "10px" }}>
-            Optimized
-          </p>
-          <p style={{ fontSize: "15px", color: "#fff", lineHeight: 1.6, fontWeight: 500 }}>
-            {clean(after)}
-          </p>
+        <div style={{ padding: "24px 28px", background: C.accentDim, position: "relative" }}>
+          <div style={{ position: "absolute", left: 0, top: "24px", bottom: "24px", width: "3px", background: C.accent, borderRadius: "0 2px 2px 0" }} />
+          <p style={{ fontSize: "11px", fontWeight: 600, color: C.accent, marginBottom: "10px", letterSpacing: "0.04em" }}>Recommended</p>
+          <p style={{ fontSize: "15px", color: C.text, lineHeight: 1.65, fontWeight: 500 }}>{clean(after)}</p>
         </div>
       </div>
     </motion.div>
@@ -100,169 +110,177 @@ export default function ComparisonView({ scraped, result }: Props) {
   const delta = after - before;
 
   let domain = scraped.url;
-  try { domain = new URL(scraped.url).hostname.replace(/^www\./, ""); } catch { /* keep */ }
+  try { domain = new URL(scraped.url).hostname.replace(/^www\./, ""); } catch { /**/ }
 
   return (
-    <div style={{ minHeight: "100vh", background: "#060606", paddingBottom: "140px" }}>
+    <div style={{ minHeight: "100vh", background: C.bg, paddingBottom: "140px", fontFamily: "inherit" }}>
 
-      {/* Nav */}
-      <motion.div
-        initial={{ opacity: 0, y: -12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3 }}
+      {/* Sticky nav */}
+      <motion.nav
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.4 }}
         style={{
           display: "flex", alignItems: "center", justifyContent: "space-between",
-          padding: "16px 32px", borderBottom: "1px solid #1a1a1a",
-          background: "rgba(6,6,6,0.92)", backdropFilter: "blur(12px)",
-          position: "sticky", top: 0, zIndex: 10,
+          padding: "0 40px", height: "56px",
+          borderBottom: `1px solid ${C.border}`,
+          background: `rgba(15,15,19,0.94)`,
+          backdropFilter: "blur(16px)",
+          position: "sticky", top: 0, zIndex: 20,
         }}
       >
-        <a href="/"
-          style={{ color: "#888", textDecoration: "none", fontSize: "14px", display: "flex", alignItems: "center", gap: "7px", transition: "color 0.15s" }}
-          onMouseEnter={(e) => (e.currentTarget.style.color = "#fff")}
-          onMouseLeave={(e) => (e.currentTarget.style.color = "#888")}
+        <a href="/" style={{ color: C.textMuted, textDecoration: "none", fontSize: "14px", display: "flex", alignItems: "center", gap: "8px", transition: "color 0.15s" }}
+          onMouseEnter={e => (e.currentTarget.style.color = C.text)}
+          onMouseLeave={e => (e.currentTarget.style.color = C.textMuted)}
         >
-          <ArrowLeft size={15} /> New analysis
+          <ArrowLeft size={14} /> New analysis
         </a>
-        <div style={{ display: "inline-flex", alignItems: "center", gap: "12px" }}>
-          <div style={{ display: "inline-flex", alignItems: "center", gap: "12px", fontSize: "18px", fontWeight: 800, letterSpacing: "-0.03em" }}>
-            <AnimatedNumber from={0} to={before} duration={800} color="#ef4444" />
-            <span style={{ color: "#333", fontSize: "14px", fontWeight: 400 }}>→</span>
-            <AnimatedNumber from={before} to={after} duration={1000} color="#14c38e" />
-          </div>
+
+        {/* Score pill */}
+        <div style={{ display: "flex", alignItems: "center", gap: "6px", background: C.surface, border: `1px solid ${C.border}`, borderRadius: "8px", padding: "8px 16px" }}>
+          <span style={{ fontSize: "15px", fontWeight: 700, letterSpacing: "-0.02em" }}>
+            <AnimatedNumber from={0} to={before} duration={800} color={C.red} />
+          </span>
+          <span style={{ color: C.textFaint, fontSize: "13px", margin: "0 4px" }}>→</span>
+          <span style={{ fontSize: "15px", fontWeight: 700, letterSpacing: "-0.02em" }}>
+            <AnimatedNumber from={before} to={after} duration={1000} color={C.accent} />
+          </span>
           <motion.span
-            initial={{ scale: 0, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ type: "spring", stiffness: 400, damping: 20, delay: 1.2 }}
-            style={{
-              fontSize: "12px", color: "#14c38e", fontWeight: 700,
-              background: "rgba(20,195,142,0.12)", border: "1px solid rgba(20,195,142,0.25)",
-              padding: "3px 10px", borderRadius: "20px",
-            }}
+            initial={{ opacity: 0, x: 4 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 1.3, duration: 0.3 }}
+            style={{ marginLeft: "6px", fontSize: "12px", fontWeight: 700, color: C.accent, background: C.accentDim, border: `1px solid ${C.accentBorder}`, borderRadius: "5px", padding: "2px 7px" }}
           >
-            +{delta} pts
+            +{delta}
           </motion.span>
         </div>
-      </motion.div>
+      </motion.nav>
 
-      <div style={{ maxWidth: "900px", margin: "0 auto", padding: "64px 32px 0" }}>
+      {/* Page body */}
+      <div style={{ maxWidth: "880px", margin: "0 auto", padding: "72px 40px 0" }}>
 
-        {/* Header */}
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} style={{ marginBottom: "60px" }}>
-          <p style={{ fontSize: "12px", fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase", color: "#14c38e", marginBottom: "14px" }}>
-            SEO Executive Summary
+        {/* — Header — */}
+        <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} style={{ marginBottom: "64px" }}>
+          <p style={{ fontSize: "13px", color: C.accent, fontWeight: 600, marginBottom: "14px" }}>
+            Homepage SEO Audit
           </p>
-          <h1 style={{ fontSize: "clamp(2.2rem, 5vw, 3.4rem)", fontWeight: 800, color: "#ffffff", letterSpacing: "-0.04em", lineHeight: 1.05, marginBottom: "18px" }}>
+          <h1 style={{ fontSize: "clamp(2rem, 5vw, 3.2rem)", fontWeight: 800, color: "#fff", letterSpacing: "-0.04em", lineHeight: 1.05, marginBottom: "20px" }}>
             {domain}
           </h1>
-          <p style={{ fontSize: "17px", color: "#999", lineHeight: 1.7, maxWidth: "580px" }}>
-            Personalized analysis of your homepage SEO, conversion structure, and trust signals. Exact copy recommendations included.
+          <p style={{ fontSize: "17px", color: C.textMuted, lineHeight: 1.75, maxWidth: "560px" }}>
+            Personalized analysis of your SEO signals, conversion copy, and trust structure. Specific fixes included.
           </p>
         </motion.div>
 
-        {/* Score card */}
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.1 }}
-          style={{ display: "grid", gridTemplateColumns: "1fr 1fr", borderRadius: "12px", overflow: "hidden", border: "1px solid #222", marginBottom: "60px" }}
-        >
-          <div style={{ padding: "36px 40px", background: "#0d0d0d", borderRight: "1px solid #222" }}>
-            <p style={{ fontSize: "11px", fontWeight: 700, letterSpacing: "0.16em", textTransform: "uppercase", color: "#777", marginBottom: "14px" }}>Current score</p>
-            <div style={{ display: "flex", alignItems: "flex-end", gap: "8px", marginBottom: "12px" }}>
-              <span style={{ fontSize: "60px", fontWeight: 900, color: "#ef4444", lineHeight: 1, letterSpacing: "-0.04em" }}>{before}</span>
-              <span style={{ fontSize: "20px", color: "#444", fontWeight: 700, paddingBottom: "7px" }}>/100</span>
+        {/* — Score banner — */}
+        <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.1 }} style={{ marginBottom: "64px" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", borderRadius: "14px", overflow: "hidden", border: `1px solid ${C.border}` }}>
+            {/* Before */}
+            <div style={{ padding: "40px 44px", background: C.surface }}>
+              <p style={{ fontSize: "13px", color: C.textFaint, fontWeight: 500, marginBottom: "16px" }}>Current score</p>
+              <div style={{ display: "flex", alignItems: "baseline", gap: "6px", marginBottom: "14px" }}>
+                <span style={{ fontSize: "68px", fontWeight: 900, color: C.red, lineHeight: 1, letterSpacing: "-0.05em" }}>{before}</span>
+                <span style={{ fontSize: "18px", color: C.textFaint, fontWeight: 600 }}>/100</span>
+              </div>
+              <div style={{ height: "4px", borderRadius: "4px", background: C.surfaceHigh, overflow: "hidden", marginBottom: "16px" }}>
+                <div style={{ height: "100%", width: `${before}%`, background: C.red, borderRadius: "4px", transition: "width 1s ease" }} />
+              </div>
+              <p style={{ fontSize: "14px", color: C.textMuted, lineHeight: 1.6 }}>Significant gaps in SEO signals, conversion copy, and trust elements.</p>
             </div>
-            <p style={{ fontSize: "15px", color: "#888", lineHeight: 1.5 }}>SEO signals, conversion structure, and trust elements need work.</p>
-          </div>
-          <div style={{ padding: "36px 40px", background: "rgba(20,195,142,0.04)", position: "relative", overflow: "hidden" }}>
-            <div style={{ position: "absolute", top: 0, right: 0, width: "180px", height: "180px", background: "radial-gradient(circle at top right, rgba(20,195,142,0.14) 0%, transparent 70%)", pointerEvents: "none" }} />
-            <p style={{ fontSize: "11px", fontWeight: 700, letterSpacing: "0.16em", textTransform: "uppercase", color: "#14c38e", marginBottom: "14px" }}>Optimized score</p>
-            <div style={{ display: "flex", alignItems: "flex-end", gap: "8px", marginBottom: "12px" }}>
-              <span style={{ fontSize: "60px", fontWeight: 900, color: "#14c38e", lineHeight: 1, letterSpacing: "-0.04em" }}>{after}</span>
-              <span style={{ fontSize: "20px", color: "#14c38e", fontWeight: 700, paddingBottom: "7px", opacity: 0.4 }}>/100</span>
+            {/* After */}
+            <div style={{ padding: "40px 44px", background: C.accentDim, position: "relative", overflow: "hidden", borderLeft: `1px solid ${C.border}` }}>
+              <div style={{ position: "absolute", top: "-40px", right: "-40px", width: "200px", height: "200px", background: "radial-gradient(circle, rgba(34,211,160,0.12) 0%, transparent 70%)", pointerEvents: "none" }} />
+              <p style={{ fontSize: "13px", color: C.accent, fontWeight: 600, marginBottom: "16px" }}>Optimized score</p>
+              <div style={{ display: "flex", alignItems: "baseline", gap: "6px", marginBottom: "14px" }}>
+                <span style={{ fontSize: "68px", fontWeight: 900, color: C.accent, lineHeight: 1, letterSpacing: "-0.05em" }}>{after}</span>
+                <span style={{ fontSize: "18px", color: C.accent, fontWeight: 600, opacity: 0.45 }}>/100</span>
+              </div>
+              <div style={{ height: "4px", borderRadius: "4px", background: "rgba(34,211,160,0.15)", overflow: "hidden", marginBottom: "16px" }}>
+                <div style={{ height: "100%", width: `${after}%`, background: C.accent, borderRadius: "4px", transition: "width 1s ease" }} />
+              </div>
+              <p style={{ fontSize: "14px", color: C.textMuted, lineHeight: 1.6 }}>
+                <span style={{ color: C.accent, fontWeight: 700 }}>+{delta} point gain</span> by applying the recommendations below.
+              </p>
             </div>
-            <p style={{ fontSize: "15px", color: "#999", lineHeight: 1.5 }}>
-              <span style={{ color: "#14c38e", fontWeight: 700 }}>+{delta} point improvement</span> with the changes below applied.
-            </p>
           </div>
         </motion.div>
 
-        {/* Copy optimizations */}
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.2 }} style={{ marginBottom: "68px" }}>
-          <p style={{ fontSize: "12px", fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", color: "#888", marginBottom: "20px" }}>
-            Copy optimizations
-          </p>
+        {/* — Copy optimizations — */}
+        <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.2 }} style={{ marginBottom: "72px" }}>
+          <SectionLabel>Copy optimizations</SectionLabel>
+          <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+            <FieldCard label="Title tag" before={scraped.title} after={result.optimizedTitle} delay={0.25} />
+            <FieldCard label="H1 heading" before={scraped.h1} after={result.optimizedH1} delay={0.3} />
+            <FieldCard label="Meta description" before={scraped.metaDescription} after={result.optimizedMeta} delay={0.35} />
+            <FieldCard label="Primary CTA" before="" after={result.optimizedCTA} delay={0.4} />
+          </div>
+        </motion.div>
+
+        {/* — Findings — */}
+        <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.42 }}>
+          <SectionLabel>Findings and recommendations</SectionLabel>
           <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-            <FieldCard label="Title Tag" before={scraped.title} after={result.optimizedTitle} delay={0.25} />
-            <FieldCard label="H1 Heading" before={scraped.h1} after={result.optimizedH1} delay={0.31} />
-            <FieldCard label="Meta Description" before={scraped.metaDescription} after={result.optimizedMeta} delay={0.37} />
-            <FieldCard label="Primary CTA" before="" after={result.optimizedCTA} delay={0.43} />
+            {result.callouts.map((callout, i) => {
+              const tag = TAG_COLORS[callout.type];
+              return (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, delay: 0.48 + i * 0.07 }}
+                  style={{
+                    background: C.surface,
+                    border: `1px solid ${C.border}`,
+                    borderLeft: `3px solid ${tag.fg}`,
+                    borderRadius: "12px",
+                    padding: "28px 32px",
+                    display: "grid",
+                    gridTemplateColumns: "220px 1fr",
+                    gap: "32px",
+                    alignItems: "start",
+                  }}
+                >
+                  {/* Left: tag + title */}
+                  <div>
+                    <div style={{ display: "inline-flex", alignItems: "center", gap: "6px", background: tag.bg, border: `1px solid ${tag.border}`, borderRadius: "6px", padding: "4px 10px", marginBottom: "14px" }}>
+                      <span style={{ color: tag.fg, display: "flex", alignItems: "center" }}>{TAG_ICONS[callout.type]}</span>
+                      <span style={{ fontSize: "11px", fontWeight: 700, color: tag.fg, letterSpacing: "0.06em" }}>{TAG_LABELS[callout.type]}</span>
+                    </div>
+                    <p style={{ fontSize: "16px", fontWeight: 700, color: "#fff", lineHeight: 1.35, letterSpacing: "-0.01em" }}>
+                      {clean(callout.label)}
+                    </p>
+                  </div>
+
+                  {/* Right: bullets */}
+                  <Bullets text={callout.description} color={tag.fg} />
+                </motion.div>
+              );
+            })}
           </div>
         </motion.div>
 
-        {/* Findings */}
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.44 }}>
-          <p style={{ fontSize: "12px", fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", color: "#888", marginBottom: "20px" }}>
-            Findings and recommendations
-          </p>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: "16px" }}>
-            {result.callouts.map((callout, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: 0.5 + i * 0.08 }}
-                style={{
-                  background: "#0d0d0d", border: "1px solid #252525",
-                  borderTop: `3px solid ${CALLOUT_COLORS[callout.type]}`,
-                  borderRadius: "10px", padding: "28px",
-                }}
-              >
-                <div style={{
-                  display: "inline-flex", alignItems: "center", gap: "7px",
-                  background: `${CALLOUT_COLORS[callout.type]}14`,
-                  border: `1px solid ${CALLOUT_COLORS[callout.type]}30`,
-                  borderRadius: "20px", padding: "5px 12px 5px 8px", marginBottom: "18px",
-                }}>
-                  <span style={{ color: CALLOUT_COLORS[callout.type], display: "flex" }}>{CALLOUT_ICONS[callout.type]}</span>
-                  <span style={{ fontSize: "11px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: CALLOUT_COLORS[callout.type] }}>
-                    {CALLOUT_LABELS[callout.type]}
-                  </span>
-                </div>
-                <p style={{ fontSize: "17px", fontWeight: 700, color: "#ffffff", marginBottom: "16px", lineHeight: 1.3, letterSpacing: "-0.01em" }}>
-                  {clean(callout.label)}
-                </p>
-                <Bullets text={callout.description} />
-              </motion.div>
-            ))}
-          </div>
-        </motion.div>
-
-        {/* CTA */}
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.6, delay: 1.2 }} style={{ textAlign: "center", marginTop: "80px" }}>
+        {/* — Scroll CTA — */}
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.6, delay: 1.2 }} style={{ textAlign: "center", marginTop: "88px" }}>
           <button
             onClick={() => leadRef.current?.scrollIntoView({ behavior: "smooth" })}
-            style={{
-              background: "none", border: "none", color: "#666", fontSize: "13px", cursor: "pointer",
-              display: "inline-flex", flexDirection: "column", alignItems: "center", gap: "10px",
-              letterSpacing: "0.08em", textTransform: "uppercase", fontWeight: 600,
-              animation: "bob 2s ease-in-out infinite", transition: "color 0.15s",
-            }}
-            onMouseEnter={(e) => (e.currentTarget.style.color = "#ccc")}
-            onMouseLeave={(e) => (e.currentTarget.style.color = "#666")}
+            style={{ background: "none", border: "none", color: C.textFaint, fontSize: "13px", cursor: "pointer", display: "inline-flex", flexDirection: "column", alignItems: "center", gap: "10px", fontWeight: 500, animation: "bob 2.2s ease-in-out infinite", transition: "color 0.15s", fontFamily: "inherit" }}
+            onMouseEnter={e => (e.currentTarget.style.color = C.textMuted)}
+            onMouseLeave={e => (e.currentTarget.style.color = C.textFaint)}
           >
             Get these changes implemented
-            <ChevronDown size={18} />
+            <ChevronDown size={16} />
           </button>
         </motion.div>
       </div>
 
-      <div ref={leadRef} style={{ marginTop: "80px" }}>
+      <div ref={leadRef} style={{ marginTop: "88px" }}>
         <LeadCapture url={scraped.url} />
       </div>
 
       <style>{`
         @keyframes bob {
           0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(6px); }
+          50% { transform: translateY(7px); }
         }
       `}</style>
     </div>
