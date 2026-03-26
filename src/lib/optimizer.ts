@@ -31,8 +31,10 @@ TASKS:
 5. Score the original page on: SEO fundamentals (0–25), Conversion elements (0–25), UX structure (0–25), Performance potential (0–25). Then score the optimized version on the same criteria.
 6. Identify 5 specific improvements you've made. Each callout needs:
    - A short label (4–7 words)
-   - A 2–3 sentence description that explains the specific problem found, what was changed, and why it will improve rankings or conversions. Be concrete — name the actual issue, not a generic observation.
+   - A description written as exactly 3 short bullet points separated by the pipe character |. Each bullet is one direct sentence. No em dashes. No filler phrases. Be specific to this business.
    - A type: "seo", "ux", "conversion", or "trust"
+
+IMPORTANT: Do not use em dashes (—) anywhere in the output. Use commas or periods instead.
 
 RESPONSE FORMAT — return ONLY valid JSON, no markdown fences, nothing else:
 {
