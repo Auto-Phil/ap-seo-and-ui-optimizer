@@ -150,7 +150,7 @@ export default function InputScreen() {
             maxWidth: "460px",
           }}
         >
-          Paste your URL. Get your page rebuilt for SEO and conversions in 15 seconds, side by side with your original.
+          Paste your URL. Get a personalized SEO executive summary — optimized title, H1, meta, copy, and conversion recommendations in 15 seconds.
         </motion.p>
 
         {/* Input */}

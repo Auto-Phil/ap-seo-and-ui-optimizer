@@ -14,7 +14,6 @@ function AnalyzeInner() {
   const [status, setStatus] = useState<"loading" | "done" | "error">("loading");
   const [scraped, setScraped] = useState<ScrapedPage | null>(null);
   const [result, setResult] = useState<OptimizationResult | null>(null);
-  const [screenshotBase64, setScreenshotBase64] = useState<string | null>(null);
   const [error, setError] = useState("");
   const ran = useRef(false);
 
@@ -24,7 +23,7 @@ function AnalyzeInner() {
 
     async function run() {
       try {
-        // Step 1: Scrape (fast — fetch-based, ~1s)
+        // Step 1: Scrape
         const scrapeRes = await fetch("/api/scrape", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -35,35 +34,21 @@ function AnalyzeInner() {
         const scrapedData: ScrapedPage = scrapeJson.data;
         setScraped(scrapedData);
 
-        // Steps 2 & 3 in parallel: AI optimize + Puppeteer screenshot
-        const [optResult, shotResult] = await Promise.allSettled([
-          fetch("/api/optimize", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              url: scrapedData.url,
-              htmlContent: scrapedData.htmlContent,
-              title: scrapedData.title,
-              metaDescription: scrapedData.metaDescription,
-              h1: scrapedData.h1,
-              brandColors: scrapedData.brandColors,
-            }),
-          }).then((r) => r.json()),
-
-          fetch("/api/screenshot", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ url: scrapedData.url }),
-          }).then((r) => r.json()),
-        ]);
-
-        const optJson = optResult.status === "fulfilled" ? optResult.value : null;
-        if (!optJson?.success) throw new Error(optJson?.error ?? "Optimization failed");
-
-        const shotJson = shotResult.status === "fulfilled" ? shotResult.value : null;
-        if (shotJson?.success && shotJson.screenshotBase64) {
-          setScreenshotBase64(shotJson.screenshotBase64);
-        }
+        // Step 2: AI optimize
+        const optRes = await fetch("/api/optimize", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            url: scrapedData.url,
+            htmlContent: scrapedData.htmlContent,
+            title: scrapedData.title,
+            metaDescription: scrapedData.metaDescription,
+            h1: scrapedData.h1,
+            brandColors: scrapedData.brandColors,
+          }),
+        });
+        const optJson = await optRes.json();
+        if (!optJson.success) throw new Error(optJson.error ?? "Optimization failed");
 
         setResult(optJson.data);
         setStatus("done");
@@ -102,7 +87,7 @@ function AnalyzeInner() {
   }
 
   if (status === "done" && scraped && result) {
-    return <ComparisonView scraped={scraped} result={result} screenshotBase64={screenshotBase64} />;
+    return <ComparisonView scraped={scraped} result={result} />;
   }
 
   return <LoadingScreen />;
