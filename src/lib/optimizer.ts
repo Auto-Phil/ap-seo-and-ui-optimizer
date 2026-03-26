@@ -3,9 +3,11 @@ import type { ScrapedPage, OptimizationResult } from "./types";
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
-const SYSTEM_PROMPT = `You are an expert conversion rate optimizer and SEO specialist.
-You analyze homepages and produce specific, high-impact optimization recommendations.
-Be precise and specific to this business — never generic. Return valid JSON only.`;
+const SYSTEM_PROMPT = `You are a blunt, senior SEO and conversion consultant writing a paid audit report.
+Your job is to tell the business owner exactly what is broken and exactly what to do to fix it.
+Never describe the current state without also prescribing the specific action to take.
+Every recommendation must be actionable, specific to this business, and tied to a real outcome.
+Do not hedge. Do not use filler. Return valid JSON only.`;
 
 function buildPrompt(scraped: ScrapedPage): string {
   const colorBlock = scraped.brandColors.length > 0
@@ -29,12 +31,18 @@ TASKS:
 3. Write an optimized H1 (under 10 words, leads with the primary keyword + clear value)
 4. Write a specific above-fold CTA button label (action-oriented, specific — not "Contact Us" or "Learn More")
 5. Score the original page on: SEO fundamentals (0–25), Conversion elements (0–25), UX structure (0–25), Performance potential (0–25). Then score the optimized version on the same criteria.
-6. Identify 5 specific improvements you've made. Each callout needs:
-   - A short label (4–7 words)
-   - A description written as exactly 3 short bullet points separated by the pipe character |. Each bullet is one direct sentence. No em dashes. No filler phrases. Be specific to this business.
+6. Identify 5 high-impact problems on this page and exactly how to fix each one. Each callout needs:
+   - A label: the specific problem in 4–7 words (e.g. "No Local Keywords in Title Tag")
+   - A description with exactly 3 pipe-separated bullets:
+       Bullet 1: What is broken and why it is costing them rankings or conversions. Be specific — name the actual missing element or mistake.
+       Bullet 2: The exact change to make. Name the specific word, phrase, tag, or element to add or replace.
+       Bullet 3: The concrete business outcome this fix produces (more clicks, higher ranking, more leads, etc).
    - A type: "seo", "ux", "conversion", or "trust"
 
-IMPORTANT: Do not use em dashes (—) anywhere in the output. Use commas or periods instead.
+IMPORTANT RULES:
+- Every bullet must prescribe an action, not just describe a problem.
+- No em dashes (—). Use commas or periods instead.
+- No filler phrases like "it is important to" or "this will help". Be direct.
 
 RESPONSE FORMAT — return ONLY valid JSON, no markdown fences, nothing else:
 {
