@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "w.max — Free Homepage Audit",
+  title: "Auto-Phil | Free Homepage Audit",
   description:
-    "Paste your URL. In 15 seconds, see your page rebuilt for SEO and conversions — side by side with your original.",
+    "Paste your URL and get a personalized SEO audit in 30 seconds — exact copy fixes for your title, H1, meta description, and CTA.",
 };
 
 export default function RootLayout({
