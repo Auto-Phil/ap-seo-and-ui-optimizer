@@ -1,8 +1,7 @@
-import * as cheerio from "cheerio";
 import type { ScrapedPage } from "./types";
 
-function extractBrandColors(rawHtml: string): string[] {
-  const hexMatches = rawHtml.match(/#[0-9a-fA-F]{6}\b/g) ?? [];
+function extractBrandColors(text: string): string[] {
+  const hexMatches = text.match(/#[0-9a-fA-F]{6}\b/g) ?? [];
   const colorCounts = new Map<string, number>();
   for (const c of hexMatches) {
     const normalized = c.toLowerCase();
@@ -16,51 +15,44 @@ function extractBrandColors(rawHtml: string): string[] {
 }
 
 export async function scrapePage(url: string): Promise<ScrapedPage> {
-  const response = await fetch(url, {
-    headers: {
-      "User-Agent":
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-      "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-      "Accept-Language": "en-US,en;q=0.9",
-    },
-    signal: AbortSignal.timeout(12000),
-  });
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 12000);
 
-  if (!response.ok) {
-    throw new Error(`Page returned ${response.status}`);
+  let text: string;
+  try {
+    const response = await fetch(`https://r.jina.ai/${url}`, {
+      headers: {
+        "Accept": "text/plain",
+        "X-Return-Format": "text",
+      },
+      signal: controller.signal,
+    });
+
+    if (!response.ok) throw new Error(`Jina returned ${response.status}`);
+    text = await response.text();
+  } finally {
+    clearTimeout(timer);
   }
 
-  const rawHtml = await response.text();
+  // Jina text format:
+  //   Title: Some Title
+  //   URL Source: https://...
+  //   ...content...
+  const titleMatch = text.match(/^Title:\s*(.+)/m);
+  const title = titleMatch?.[1]?.trim() ?? "";
 
-  const $raw = cheerio.load(rawHtml);
-  const title = $raw("title").text().trim();
-  const metaDescription = $raw('meta[name="description"]').attr("content")?.trim() ?? "";
-  const h1 = $raw("h1").first().text().trim();
+  const h1Match = text.match(/^#\s+(.+)/m);
+  const h1 = h1Match?.[1]?.trim() ?? "";
 
-  const $ = cheerio.load(rawHtml);
-  $("script, style, noscript, iframe, svg").remove();
-  $("*").each((_, el) => {
-    if (el.type === "tag") {
-      const allowed = ["id", "href", "src", "alt", "title", "aria-label"];
-      const attrs = Object.keys(el.attribs);
-      for (const attr of attrs) {
-        if (!allowed.includes(attr)) delete el.attribs[attr];
-      }
-    }
-  });
-
-  let htmlContent = $("body").html() ?? "";
-  htmlContent = htmlContent.replace(/\s+/g, " ").trim();
-  if (htmlContent.length > 15000) htmlContent = htmlContent.slice(0, 15000);
-
-  const brandColors = extractBrandColors(rawHtml);
+  // Trim content to keep Claude calls fast
+  const content = text.length > 12000 ? text.slice(0, 12000) : text;
 
   return {
     url,
-    htmlContent,
+    htmlContent: content,
     title,
-    metaDescription,
+    metaDescription: "",
     h1,
-    brandColors,
+    brandColors: extractBrandColors(text),
   };
 }
