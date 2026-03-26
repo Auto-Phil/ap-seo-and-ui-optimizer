@@ -114,7 +114,7 @@ export default function InputScreen() {
               paddingBottom: "4px",
             }}
           >
-            Free Homepage Audit
+            Free SEO Audit · 30 Seconds
           </span>
         </motion.div>
 
@@ -132,9 +132,9 @@ export default function InputScreen() {
             marginBottom: "20px",
           }}
         >
-          See what your homepage
+          Your personalized
           <br />
-          could be.
+          SEO audit.
         </motion.h1>
 
         {/* Subheadline */}
@@ -150,7 +150,7 @@ export default function InputScreen() {
             maxWidth: "460px",
           }}
         >
-          Paste your URL. Get a personalized SEO executive summary — optimized title, H1, meta, copy, and conversion recommendations in 15 seconds.
+          Paste your URL and get a personalized audit in 30 seconds — exact copy fixes for your title, H1, meta description, and CTA, plus a scored breakdown of what&apos;s costing you rankings.
         </motion.p>
 
         {/* Input */}

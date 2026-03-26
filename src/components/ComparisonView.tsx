@@ -11,9 +11,7 @@ import {
   Analytics,
   Laptop,
   Certificate,
-  CheckmarkFilled,
   ChevronDown,
-  ArrowRight,
 } from "@carbon/icons-react";
 
 interface Props {
@@ -22,10 +20,10 @@ interface Props {
 }
 
 const CALLOUT_ICONS: Record<Callout["type"], React.ReactNode> = {
-  seo: <Search size={18} />,
-  conversion: <Analytics size={18} />,
-  ux: <Laptop size={18} />,
-  trust: <Certificate size={18} />,
+  seo: <Search size={20} />,
+  conversion: <Analytics size={20} />,
+  ux: <Laptop size={20} />,
+  trust: <Certificate size={20} />,
 };
 
 const CALLOUT_COLORS: Record<Callout["type"], string> = {
@@ -35,47 +33,14 @@ const CALLOUT_COLORS: Record<Callout["type"], string> = {
   trust: "#fbbf24",
 };
 
-const CALLOUT_BG: Record<Callout["type"], string> = {
-  seo: "rgba(20,195,142,0.06)",
-  conversion: "rgba(96,165,250,0.06)",
-  ux: "rgba(167,139,250,0.06)",
-  trust: "rgba(251,191,36,0.06)",
+const CALLOUT_LABELS: Record<Callout["type"], string> = {
+  seo: "SEO",
+  conversion: "Conversion",
+  ux: "UX",
+  trust: "Trust",
 };
 
-function ScoreGauge({ score, color, label }: { score: number; label: string; color: string }) {
-  const radius = 36;
-  const circumference = 2 * Math.PI * radius;
-  const dash = (score / 100) * circumference;
-
-  return (
-    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "10px" }}>
-      <div style={{ position: "relative", width: "96px", height: "96px" }}>
-        <svg width="96" height="96" style={{ transform: "rotate(-90deg)" }}>
-          <circle cx="48" cy="48" r={radius} fill="none" stroke="#1a1a1a" strokeWidth="6" />
-          <circle
-            cx="48"
-            cy="48"
-            r={radius}
-            fill="none"
-            stroke={color}
-            strokeWidth="6"
-            strokeDasharray={`${dash} ${circumference}`}
-            strokeLinecap="round"
-            style={{ transition: "stroke-dasharray 1.2s ease" }}
-          />
-        </svg>
-        <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <span style={{ fontSize: "22px", fontWeight: 800, color, letterSpacing: "-0.03em" }}>{score}</span>
-        </div>
-      </div>
-      <span style={{ fontSize: "10px", fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "#444" }}>
-        {label}
-      </span>
-    </div>
-  );
-}
-
-function ComparisonRow({
+function FieldCard({
   label,
   before,
   after,
@@ -88,55 +53,80 @@ function ComparisonRow({
 }) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 12 }}
+      initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay }}
       style={{
-        display: "grid",
-        gridTemplateColumns: "100px 1fr 28px 1fr",
-        gap: "0",
-        alignItems: "start",
-        borderBottom: "1px solid #141414",
-        padding: "20px 0",
+        background: "#0d0d0d",
+        border: "1px solid #222",
+        borderRadius: "10px",
+        overflow: "hidden",
       }}
     >
-      {/* Label */}
-      <div style={{ paddingTop: "2px" }}>
-        <span style={{ fontSize: "9px", fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", color: "#3a3a3a" }}>
+      {/* Field label bar */}
+      <div style={{
+        padding: "12px 24px",
+        borderBottom: "1px solid #1a1a1a",
+        background: "#0a0a0a",
+      }}>
+        <span style={{
+          fontSize: "11px",
+          fontWeight: 700,
+          letterSpacing: "0.14em",
+          textTransform: "uppercase",
+          color: "#14c38e",
+        }}>
           {label}
         </span>
       </div>
 
-      {/* Before */}
-      <div style={{ padding: "0 20px 0 0" }}>
-        <p style={{
-          fontSize: "13px",
-          color: before ? "#555" : "#333",
-          lineHeight: 1.6,
-          fontStyle: before ? "normal" : "italic",
-          borderLeft: "2px solid #1e1e1e",
-          paddingLeft: "14px",
+      {/* Before / After */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr" }}>
+        {/* Before */}
+        <div style={{
+          padding: "20px 24px",
+          borderRight: "1px solid #1a1a1a",
         }}>
-          {before || "Not found"}
-        </p>
-      </div>
+          <p style={{
+            fontSize: "10px",
+            fontWeight: 600,
+            letterSpacing: "0.12em",
+            textTransform: "uppercase",
+            color: "#555",
+            marginBottom: "10px",
+          }}>Current</p>
+          <p style={{
+            fontSize: "15px",
+            color: before ? "#888" : "#444",
+            lineHeight: 1.6,
+            fontStyle: before ? "normal" : "italic",
+          }}>
+            {before || "Not detected"}
+          </p>
+        </div>
 
-      {/* Arrow */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", paddingTop: "3px" }}>
-        <ArrowRight size={12} style={{ color: "#2a2a2a" }} />
-      </div>
-
-      {/* After */}
-      <div style={{ padding: "0 0 0 20px" }}>
-        <p style={{
-          fontSize: "13px",
-          color: "#d0d0d0",
-          lineHeight: 1.6,
-          borderLeft: "2px solid #14c38e",
-          paddingLeft: "14px",
+        {/* After */}
+        <div style={{
+          padding: "20px 24px",
+          background: "rgba(20,195,142,0.03)",
         }}>
-          {after}
-        </p>
+          <p style={{
+            fontSize: "10px",
+            fontWeight: 600,
+            letterSpacing: "0.12em",
+            textTransform: "uppercase",
+            color: "#14c38e",
+            marginBottom: "10px",
+          }}>Optimized</p>
+          <p style={{
+            fontSize: "15px",
+            color: "#ffffff",
+            lineHeight: 1.6,
+            fontWeight: 500,
+          }}>
+            {after}
+          </p>
+        </div>
       </div>
     </motion.div>
   );
@@ -155,9 +145,9 @@ export default function ComparisonView({ scraped, result }: Props) {
   }
 
   return (
-    <div style={{ minHeight: "100vh", background: "#060606", paddingBottom: "120px" }}>
+    <div style={{ minHeight: "100vh", background: "#060606", paddingBottom: "140px" }}>
 
-      {/* Top bar */}
+      {/* Top nav */}
       <motion.div
         initial={{ opacity: 0, y: -12 }}
         animate={{ opacity: 1, y: 0 }}
@@ -166,9 +156,10 @@ export default function ComparisonView({ scraped, result }: Props) {
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
-          padding: "14px 24px",
-          borderBottom: "1px solid #141414",
-          background: "#060606",
+          padding: "16px 32px",
+          borderBottom: "1px solid #181818",
+          background: "rgba(6,6,6,0.9)",
+          backdropFilter: "blur(12px)",
           position: "sticky",
           top: 0,
           zIndex: 10,
@@ -177,26 +168,25 @@ export default function ComparisonView({ scraped, result }: Props) {
         <a
           href="/"
           style={{
-            color: "#555",
+            color: "#666",
             textDecoration: "none",
-            fontSize: "13px",
+            fontSize: "14px",
             display: "flex",
             alignItems: "center",
-            gap: "6px",
+            gap: "7px",
             transition: "color 0.15s",
           }}
-          onMouseEnter={(e) => (e.currentTarget.style.color = "#f0f0f0")}
-          onMouseLeave={(e) => (e.currentTarget.style.color = "#555")}
+          onMouseEnter={(e) => (e.currentTarget.style.color = "#fff")}
+          onMouseLeave={(e) => (e.currentTarget.style.color = "#666")}
         >
-          <ArrowLeft size={14} />
-          Back
+          <ArrowLeft size={15} />
+          New analysis
         </a>
 
-        {/* Score badge */}
-        <div style={{ display: "inline-flex", alignItems: "center", gap: "10px" }}>
-          <div style={{ display: "inline-flex", alignItems: "center", gap: "10px", fontSize: "17px", fontWeight: 700, letterSpacing: "-0.02em" }}>
+        <div style={{ display: "inline-flex", alignItems: "center", gap: "12px" }}>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: "12px", fontSize: "18px", fontWeight: 800, letterSpacing: "-0.03em" }}>
             <AnimatedNumber from={0} to={before} duration={800} color="#ef4444" />
-            <span style={{ color: "#2a2a2a", fontSize: "12px" }}>→</span>
+            <span style={{ color: "#333", fontSize: "14px", fontWeight: 400 }}>→</span>
             <AnimatedNumber from={before} to={after} duration={1000} color="#14c38e" />
           </div>
           <motion.span
@@ -204,14 +194,14 @@ export default function ComparisonView({ scraped, result }: Props) {
             animate={{ scale: 1, opacity: 1 }}
             transition={{ type: "spring", stiffness: 400, damping: 20, delay: 1.2 }}
             style={{
-              fontSize: "11px",
+              fontSize: "12px",
               color: "#14c38e",
-              fontWeight: 600,
-              letterSpacing: "0.02em",
-              background: "rgba(20,195,142,0.1)",
-              border: "1px solid rgba(20,195,142,0.2)",
-              padding: "2px 8px",
-              borderRadius: "4px",
+              fontWeight: 700,
+              background: "rgba(20,195,142,0.12)",
+              border: "1px solid rgba(20,195,142,0.25)",
+              padding: "3px 10px",
+              borderRadius: "20px",
+              letterSpacing: "0.01em",
             }}
           >
             +{delta} pts
@@ -219,105 +209,156 @@ export default function ComparisonView({ scraped, result }: Props) {
         </div>
       </motion.div>
 
-      {/* Main content */}
-      <div style={{ maxWidth: "860px", margin: "0 auto", padding: "56px 24px 0" }}>
+      <div style={{ maxWidth: "900px", margin: "0 auto", padding: "64px 32px 0" }}>
 
-        {/* Header */}
+        {/* Page header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.45 }}
-          style={{ marginBottom: "56px" }}
-        >
-          <p style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", color: "#14c38e", marginBottom: "14px" }}>
-            SEO Executive Summary
-          </p>
-          <h1 style={{ fontSize: "clamp(1.8rem, 4vw, 2.8rem)", fontWeight: 800, color: "#f0f0f0", letterSpacing: "-0.03em", lineHeight: 1.1, marginBottom: "10px" }}>
-            {domain}
-          </h1>
-          <p style={{ fontSize: "14px", color: "#444", lineHeight: 1.6, maxWidth: "520px" }}>
-            We analyzed your homepage against SEO fundamentals, conversion structure, and UX signals. Here&apos;s what we found — and how it should read instead.
-          </p>
-        </motion.div>
-
-        {/* Score gauges */}
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.45, delay: 0.1 }}
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "40px",
-            background: "#0a0a0a",
-            border: "1px solid #1a1a1a",
-            borderRadius: "8px",
-            padding: "32px 40px",
-            marginBottom: "56px",
-          }}
-        >
-          <ScoreGauge score={before} color="#ef4444" label="Current" />
-
-          <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "8px" }}>
-            <p style={{ fontSize: "15px", fontWeight: 700, color: "#d0d0d0", letterSpacing: "-0.01em" }}>
-              Your homepage scores <span style={{ color: "#ef4444" }}>{before}/100</span> today.
-            </p>
-            <p style={{ fontSize: "13px", color: "#555", lineHeight: 1.65 }}>
-              With the optimizations below, it should score <span style={{ color: "#14c38e", fontWeight: 600 }}>{after}/100</span> — a gain of <span style={{ color: "#14c38e", fontWeight: 600 }}>+{delta} points</span> in SEO visibility, conversion structure, and first impression.
-            </p>
-          </div>
-
-          <ScoreGauge score={after} color="#14c38e" label="Optimized" />
-        </motion.div>
-
-        {/* Comparison table */}
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.45, delay: 0.2 }}
+          transition={{ duration: 0.5 }}
           style={{ marginBottom: "64px" }}
         >
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "4px" }}>
-            <p style={{ fontSize: "10px", fontWeight: 600, letterSpacing: "0.14em", textTransform: "uppercase", color: "#333" }}>
-              Copy optimizations
-            </p>
-            <div style={{ display: "grid", gridTemplateColumns: "100px 1fr 28px 1fr", gap: "0", width: "100%" }}>
-              <span />
-              <span style={{ fontSize: "9px", fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "#333", paddingLeft: "14px" }}>
-                Current
-              </span>
-              <span />
-              <span style={{ fontSize: "9px", fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "#14c38e", paddingLeft: "34px" }}>
-                Optimized
-              </span>
+          <p style={{
+            fontSize: "12px",
+            fontWeight: 700,
+            letterSpacing: "0.2em",
+            textTransform: "uppercase",
+            color: "#14c38e",
+            marginBottom: "16px",
+          }}>
+            SEO Executive Summary
+          </p>
+          <h1 style={{
+            fontSize: "clamp(2.2rem, 5vw, 3.6rem)",
+            fontWeight: 800,
+            color: "#ffffff",
+            letterSpacing: "-0.04em",
+            lineHeight: 1.05,
+            marginBottom: "20px",
+          }}>
+            {domain}
+          </h1>
+          <p style={{
+            fontSize: "17px",
+            color: "#888",
+            lineHeight: 1.7,
+            maxWidth: "580px",
+          }}>
+            We analyzed your homepage against SEO fundamentals, conversion structure, and trust signals. Here&apos;s exactly what needs to change — and the improved copy to replace it with.
+          </p>
+        </motion.div>
+
+        {/* Score card */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            borderRadius: "12px",
+            overflow: "hidden",
+            border: "1px solid #222",
+            marginBottom: "64px",
+          }}
+        >
+          {/* Before score */}
+          <div style={{
+            padding: "36px 40px",
+            background: "#0d0d0d",
+            borderRight: "1px solid #222",
+          }}>
+            <p style={{
+              fontSize: "11px",
+              fontWeight: 700,
+              letterSpacing: "0.16em",
+              textTransform: "uppercase",
+              color: "#555",
+              marginBottom: "16px",
+            }}>Current score</p>
+            <div style={{ display: "flex", alignItems: "flex-end", gap: "8px", marginBottom: "12px" }}>
+              <span style={{ fontSize: "64px", fontWeight: 900, color: "#ef4444", lineHeight: 1, letterSpacing: "-0.04em" }}>{before}</span>
+              <span style={{ fontSize: "22px", color: "#333", fontWeight: 700, paddingBottom: "8px" }}>/100</span>
             </div>
+            <p style={{ fontSize: "15px", color: "#666", lineHeight: 1.5 }}>
+              Missing key SEO signals, weak conversion structure.
+            </p>
           </div>
 
-          <div style={{ borderTop: "1px solid #1a1a1a" }}>
-            <ComparisonRow label="Title Tag" before={scraped.title} after={result.optimizedTitle} delay={0.25} />
-            <ComparisonRow label="H1 Heading" before={scraped.h1} after={result.optimizedH1} delay={0.31} />
-            <ComparisonRow label="Meta Desc." before={scraped.metaDescription} after={result.optimizedMeta} delay={0.37} />
-            <ComparisonRow label="Primary CTA" before="" after={result.optimizedCTA} delay={0.43} />
+          {/* After score */}
+          <div style={{
+            padding: "36px 40px",
+            background: "rgba(20,195,142,0.04)",
+            position: "relative",
+            overflow: "hidden",
+          }}>
+            <div style={{
+              position: "absolute",
+              top: 0, right: 0,
+              width: "200px", height: "200px",
+              background: "radial-gradient(circle at top right, rgba(20,195,142,0.12) 0%, transparent 70%)",
+              pointerEvents: "none",
+            }} />
+            <p style={{
+              fontSize: "11px",
+              fontWeight: 700,
+              letterSpacing: "0.16em",
+              textTransform: "uppercase",
+              color: "#14c38e",
+              marginBottom: "16px",
+            }}>Optimized score</p>
+            <div style={{ display: "flex", alignItems: "flex-end", gap: "8px", marginBottom: "12px" }}>
+              <span style={{ fontSize: "64px", fontWeight: 900, color: "#14c38e", lineHeight: 1, letterSpacing: "-0.04em" }}>{after}</span>
+              <span style={{ fontSize: "22px", color: "#14c38e", fontWeight: 700, paddingBottom: "8px", opacity: 0.5 }}>/100</span>
+            </div>
+            <p style={{ fontSize: "15px", color: "#888", lineHeight: 1.5 }}>
+              <span style={{ color: "#14c38e", fontWeight: 700 }}>+{delta} point improvement</span> with the changes below.
+            </p>
           </div>
         </motion.div>
 
-        {/* Callouts */}
+        {/* Copy optimizations */}
         <motion.div
-          initial={{ opacity: 0, y: 24 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.45 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          style={{ marginBottom: "72px" }}
         >
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "24px" }}>
-            <p style={{ fontSize: "10px", fontWeight: 600, letterSpacing: "0.14em", textTransform: "uppercase", color: "#444" }}>
-              Improvements identified
-            </p>
-            <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-              <CheckmarkFilled size={13} style={{ color: "#14c38e" }} />
-              <span style={{ fontSize: "11px", color: "#14c38e", letterSpacing: "0.03em" }}>Analysis complete</span>
-            </div>
+          <div style={{ marginBottom: "24px" }}>
+            <p style={{
+              fontSize: "12px",
+              fontWeight: 700,
+              letterSpacing: "0.18em",
+              textTransform: "uppercase",
+              color: "#555",
+            }}>Copy optimizations</p>
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "14px" }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+            <FieldCard label="Title Tag" before={scraped.title} after={result.optimizedTitle} delay={0.25} />
+            <FieldCard label="H1 Heading" before={scraped.h1} after={result.optimizedH1} delay={0.31} />
+            <FieldCard label="Meta Description" before={scraped.metaDescription} after={result.optimizedMeta} delay={0.37} />
+            <FieldCard label="Primary CTA" before="" after={result.optimizedCTA} delay={0.43} />
+          </div>
+        </motion.div>
+
+        {/* Callout cards */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.44 }}
+        >
+          <div style={{ marginBottom: "24px" }}>
+            <p style={{
+              fontSize: "12px",
+              fontWeight: 700,
+              letterSpacing: "0.18em",
+              textTransform: "uppercase",
+              color: "#555",
+            }}>Findings & recommendations</p>
+          </div>
+
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: "16px" }}>
             {result.callouts.map((callout, i) => (
               <motion.div
                 key={i}
@@ -325,23 +366,53 @@ export default function ComparisonView({ scraped, result }: Props) {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, delay: 0.5 + i * 0.08 }}
                 style={{
-                  background: CALLOUT_BG[callout.type],
-                  border: `1px solid ${CALLOUT_COLORS[callout.type]}22`,
-                  borderTop: `2px solid ${CALLOUT_COLORS[callout.type]}`,
-                  borderRadius: "6px",
-                  padding: "22px 20px",
+                  background: "#0d0d0d",
+                  border: "1px solid #222",
+                  borderRadius: "10px",
+                  padding: "28px",
+                  borderTop: `3px solid ${CALLOUT_COLORS[callout.type]}`,
                 }}
               >
-                <div style={{ color: CALLOUT_COLORS[callout.type], marginBottom: "14px", display: "flex", alignItems: "center", gap: "8px" }}>
-                  {CALLOUT_ICONS[callout.type]}
-                  <span style={{ fontSize: "9px", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase" }}>
-                    {callout.type}
+                {/* Badge */}
+                <div style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  background: `${CALLOUT_COLORS[callout.type]}14`,
+                  border: `1px solid ${CALLOUT_COLORS[callout.type]}30`,
+                  borderRadius: "20px",
+                  padding: "5px 12px 5px 8px",
+                  marginBottom: "18px",
+                }}>
+                  <span style={{ color: CALLOUT_COLORS[callout.type], display: "flex" }}>
+                    {CALLOUT_ICONS[callout.type]}
+                  </span>
+                  <span style={{
+                    fontSize: "11px",
+                    fontWeight: 700,
+                    letterSpacing: "0.08em",
+                    textTransform: "uppercase",
+                    color: CALLOUT_COLORS[callout.type],
+                  }}>
+                    {CALLOUT_LABELS[callout.type]}
                   </span>
                 </div>
-                <p style={{ fontSize: "14px", fontWeight: 700, color: "#e0e0e0", marginBottom: "10px", lineHeight: 1.3, letterSpacing: "-0.01em" }}>
+
+                <p style={{
+                  fontSize: "16px",
+                  fontWeight: 700,
+                  color: "#ffffff",
+                  marginBottom: "12px",
+                  lineHeight: 1.35,
+                  letterSpacing: "-0.01em",
+                }}>
                   {callout.label}
                 </p>
-                <p style={{ fontSize: "13px", color: "#777", lineHeight: 1.7 }}>
+                <p style={{
+                  fontSize: "14px",
+                  color: "#999",
+                  lineHeight: 1.75,
+                }}>
                   {callout.description}
                 </p>
               </motion.div>
@@ -349,49 +420,50 @@ export default function ComparisonView({ scraped, result }: Props) {
           </div>
         </motion.div>
 
-        {/* Scroll prompt */}
+        {/* CTA prompt */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.6, delay: 1.2 }}
-          style={{ textAlign: "center", marginTop: "72px" }}
+          style={{ textAlign: "center", marginTop: "80px" }}
         >
           <button
             onClick={() => leadRef.current?.scrollIntoView({ behavior: "smooth" })}
             style={{
               background: "none",
               border: "none",
-              color: "#444",
-              fontSize: "12px",
+              color: "#555",
+              fontSize: "13px",
               cursor: "pointer",
               display: "inline-flex",
               flexDirection: "column",
               alignItems: "center",
-              gap: "8px",
-              letterSpacing: "0.06em",
+              gap: "10px",
+              letterSpacing: "0.08em",
               textTransform: "uppercase",
+              fontWeight: 600,
               animation: "bob 2s ease-in-out infinite",
               transition: "color 0.15s",
             }}
-            onMouseEnter={(e) => (e.currentTarget.style.color = "#888")}
-            onMouseLeave={(e) => (e.currentTarget.style.color = "#444")}
+            onMouseEnter={(e) => (e.currentTarget.style.color = "#aaa")}
+            onMouseLeave={(e) => (e.currentTarget.style.color = "#555")}
           >
-            Book your free call
-            <ChevronDown size={16} />
+            Get these changes implemented
+            <ChevronDown size={18} />
           </button>
         </motion.div>
 
       </div>
 
       {/* Lead capture */}
-      <div ref={leadRef} style={{ marginTop: "72px" }}>
+      <div ref={leadRef} style={{ marginTop: "80px" }}>
         <LeadCapture url={scraped.url} />
       </div>
 
       <style>{`
         @keyframes bob {
           0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(5px); }
+          50% { transform: translateY(6px); }
         }
       `}</style>
     </div>
