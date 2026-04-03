@@ -17,7 +17,7 @@ BUSINESS INFO:
 - Current meta description: ${scraped.metaDescription}
 - Current H1: ${scraped.h1}
 
-CURRENT HTML:
+CURRENT PAGE CONTENT (may be HTML or markdown — analyze as-is):
 ${scraped.htmlContent}
 
 Your task:
