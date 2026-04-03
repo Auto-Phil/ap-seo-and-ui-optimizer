@@ -46,10 +46,15 @@ Score the original page on:
 Then score your optimized version on the same criteria. The after score MUST be higher than the before score.
 
 CALLOUTS:
-Identify exactly 4 specific improvements you made. Each must be:
-- A short label (4-7 words)
-- One sentence explaining why it helps conversions or SEO
+Identify exactly 4 concrete, actionable SEO/CRO recommendations for this specific site. These are advice for the site owner — not a description of what you did in the rebuild. Frame each as something they should do or fix.
+
+Each callout must be:
+- A short label (4-7 words) that names the specific problem (e.g. "Missing primary keyword in H1", "No above-fold CTA", "Meta description too generic")
+- One sentence explaining exactly what to fix and why it will improve rankings or conversions — be specific to THIS site, not generic advice
 - A type: "seo", "ux", "conversion", or "trust"
+
+BAD example (do not do this): { "label": "Strong value proposition added", "description": "The page now leads with a clear value proposition." }
+GOOD example: { "label": "H1 missing target keyword", "description": "Your H1 says 'Welcome' instead of leading with your core service — rewrite it to include your primary keyword and value prop in under 10 words." }
 
 RESPONSE FORMAT — return ONLY valid JSON, no markdown, no explanation:
 {
